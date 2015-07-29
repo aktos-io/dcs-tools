@@ -1,6 +1,15 @@
-run
+# Install
 
-	./configure
+
+Preferably create a project directroy per device:
+
+```
+cd project-directory
+git clone https://github.com/ceremcem/aktos-dcs-tools project-tools
+ln -s project-tools/Makefile . 
+```
+
+	./project-tools/configure
 	# edit the configuration file
 
 	# for options:
@@ -18,3 +27,8 @@ run
 	make backup-local-root  # backup this machine's root folder
 
  
+	# direct options
+	make init-direct
+	make ssh-direct
+	make backup-remote-root-direct
+	make mount-root-direct
