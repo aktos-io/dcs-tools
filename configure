@@ -1,0 +1,8 @@
+#!/bin/bash
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+if [[ ! -e "$DIR/config.mk" ]]; then
+  cp "$DIR/default-config.mk" "$DIR/config.mk"
+fi
+
+nano "$DIR/config.mk"
