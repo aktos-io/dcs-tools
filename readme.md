@@ -9,9 +9,9 @@ Capabilities:
 * can do incremental backups via `rsyc` and transfers only changed files and keeps versions.
 
 > Hint: You may use this toolset to take full incremental backups for your own computer: 
-    
-    make init 
-    make backup-local-root
+>    
+>      make init 
+>      make backup-local-root
 
 # Install
 
