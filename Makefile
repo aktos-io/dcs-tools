@@ -50,7 +50,7 @@ auto-update:
 	  echo "Needs auto-update, please wait..."; \
 		OLDPWD=$$PWD; \
 		cd $(TOOLS_DIR); \
-		bzr pull || exit 1; \
+		bzr pull || git pull || exit 1; \
 		touch $(NO_NEED_UPDATE_FLAG); \
 		cd $$OLDPWD; \
 	fi;
