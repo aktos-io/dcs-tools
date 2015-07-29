@@ -1,5 +1,19 @@
-# Install
+# aktos-dcs-tools 
 
+This toolset is intended to use with remote Linux devices (embedded or not). 
+
+Capabilities: 
+* can connect with ssh over "SSH Rendezvous Server"
+* can ssh directly 
+* can mount/umount target device's root directory 
+* can do incremental backups via `rsyc` and transfers only changed files and keeps versions.
+
+> Hint: You may use this toolset to take full incremental backups for your own computer: 
+    
+    make init 
+    make backup-local-root
+
+# Install
 
 Preferably create a project directroy per device:
 
