@@ -185,7 +185,7 @@ backup-remote-root-proxy:
 	@echo "Backup remote root folder here..."
 
 	@${MAKE} -s get-sshd-port
-	sudo ${MAKE} backup-root-template SYNC_TEMPLATE_VARIABLE=remote
+	sudo ${MAKE} backup-root-template SYNC_TEMPLATE_VARIABLE=proxy
 
 backup-remote-root-direct:
 	@make -s common-action
