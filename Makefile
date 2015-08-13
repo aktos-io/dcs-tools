@@ -31,11 +31,62 @@ include $(TOOLS_DIR)/local-backup.mk
 PUBLIC_KEY := $(shell ssh-keygen -y -f $(SSH_KEY_FILE))
 
 
+DIRECT_SESSION := session-type--direct
+PROXY_SESSION := session-type--proxy
+LOCAL_SESSION := session-type--local
+
 # update if needed...
 common-action:
 	@make -s check-for-project-root
 	@make -s auto-update
+	
+clean-session: 
+	@rm $(DIRECT_SESSION) 2> /dev/null; true
+	@rm $(PROXY_SESSION) 2> /dev/null; true
+	@rm $(LOCAL_SESSION) 2> /dev/null; true
+	
+set-direct-session: clean-session
+	@echo "creating direct session..."
+	touch $(DIRECT_SESSION)
 
+set-proxy-session: clean-session
+	@echo "creating proxy session..."
+	touch $(PROXY_SESSION)
+	
+set-local-session: clean-session
+	@echo "creating local session..."
+	touch $(LOCAL_SESSION)
+	
+set-default-session: 
+	@if test ! -e $(DIRECT_SESSION) && test ! -e $(PROXY_SESSION) && test ! -e $(LOCAL_SESSION); then \
+		echo "no previous sessions found, setting default session..."; \
+		make -s set-direct-session; \
+	fi 
+
+ssh: set-default-session
+	@if [[ -f $(DIRECT_SESSION) ]]; then \
+		make -s ssh-direct; \
+	elif [[ -f $(PROXY_SESSION) ]]; then \
+		make -s ssh-proxy; \
+	fi
+		
+mount-root: set-default-session
+	@if [[ -f $(DIRECT_SESSION) ]]; then \
+		make -s mount-root-direct; \
+	elif [[ -f $(PROXY_SESSION) ]]; then \
+		make -s mount-root-proxy; \
+	fi
+
+backup-root: set-default-session
+	@if [[ -f $(DIRECT_SESSION) ]]; then \
+		make -s backup-remote-root-direct; \
+	elif [[ -f $(PROXY_SESSION) ]]; then \
+		make -s backup-remote-root-proxy; \
+	elif [[ -f $(LOCAL_SESSION) ]]; then \
+		make -s backup-local-root; \
+	fi
+
+		
 check-for-project-root:
 	@if [[ -e $(PROJECT_ROOT)/snapshots ]]; then \
 		echo "project root is correct"; \
@@ -50,7 +101,7 @@ auto-update:
 	  echo "Needs auto-update, please wait..."; \
 		OLDPWD=$$PWD; \
 		cd $(TOOLS_DIR); \
-		bzr pull || git pull || exit 1; \
+		git pull || exit 1; \
 		touch $(NO_NEED_UPDATE_FLAG); \
 		cd $$OLDPWD; \
 	fi;
@@ -62,7 +113,7 @@ update:
 init-all:
 	@make -s init-remote
 
-init-remote:
+init-proxy:
 	@${MAKE} -s init
 	@${MAKE} ssh-copy-user-id
 	@make -s common-action
@@ -74,7 +125,7 @@ init-direct:
 	
 
 
-mount-root: get-sshd-port
+mount-root-proxy: get-sshd-port
 	@make -s common-action
 	sshfs -p $(TARGET_SSHD_PORT) $(NODE_USERNAME)@localhost:/ $(MOUNT_DIR)
 	rm  $(NODE_MOUNT_DIR_LINK_NAME) 2> /dev/null; true
@@ -112,13 +163,13 @@ get-sshd-port:
 	ssh $(SERVER_USERNAME)@ceremcem.net -L $(TARGET_SSHD_PORT):localhost:$(TARGET_SSHD_PORT) -N 2> /dev/null &
 	sleep 5
 
-ssh: get-sshd-port
+ssh-proxy: get-sshd-port
 	ssh $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT)
 
 ssh-direct: 
 	ssh $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT)
 
-backup-remote-root:
+backup-remote-root-proxy:
 	@make -s common-action
 	@echo
 	@echo

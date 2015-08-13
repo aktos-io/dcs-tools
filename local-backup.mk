@@ -24,7 +24,7 @@ init:
 	mkdir -p $(PROJECT_ROOT)/snapshots/tmp
 	@make -s common-action
 
-clear-tmp:
+clean-tmp:
 	echo "clearing tmp directory..."
 	rm -r $(PROJECT_ROOT)/snapshots/tmp/* 2> /dev/null; true
 
@@ -45,14 +45,14 @@ sync-remote:
 					echo "mark to remove HARDLINKS_TMP_FOLDER: " $(HARDLINKS_TMP_FOLDER); \
 					mv $(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/tmp/$(shell date +%s) || { exit 1; }; \
 				fi; \
-				make -s clear-tmp & \
+				make -s clean-tmp & \
 				sleep 2; \
 				echo "copying hardlinks..." ; \
 				time cp -al $(PROJECT_ROOT)/snapshots/$(LAST_COMPLETE_SYNC_FOLDER) \
 							$(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) || { exit 1; }; \
 				mv $(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER); \
 				fi; \
-				make -s clear-tmp & \
+				make -s clean-tmp & \
 				echo "SYNC_TMP_FOLDER ready, starting sync..."; \
 			time rsync -aHAXvPh \
 				--delete \
@@ -71,14 +71,14 @@ sync-direct:
 					echo "mark to remove HARDLINKS_TMP_FOLDER: " $(HARDLINKS_TMP_FOLDER); \
 					mv $(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/tmp/$(shell date +%s) || { exit 1; }; \
 				fi; \
-				make -s clear-tmp & \
+				make -s clean-tmp & \
 				sleep 2; \
 				echo "copying hardlinks..." ; \
 				time cp -al $(PROJECT_ROOT)/snapshots/$(LAST_COMPLETE_SYNC_FOLDER) \
 							$(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) || { exit 1; }; \
 				mv $(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER); \
 				fi; \
-				make -s clear-tmp & \
+				make -s clean-tmp & \
 				echo "SYNC_TMP_FOLDER ready, starting sync..."; \
 			time rsync -aHAXvPh \
 				--delete \
@@ -96,14 +96,14 @@ sync-local:
 					echo "mark to remove HARDLINKS_TMP_FOLDER: " $(HARDLINKS_TMP_FOLDER); \
 					mv $(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/tmp/$(shell date +%s) || { exit 1; }; \
 				fi; \
-				make -s clear-tmp & \
+				make -s clean-tmp & \
 				sleep 2; \
 				echo "copying hardlinks..." ; \
 				time cp -al $(PROJECT_ROOT)/snapshots/$(LAST_COMPLETE_SYNC_FOLDER) \
 							$(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) || { exit 1; }; \
 				mv $(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER); \
 				fi; \
-				make -s clear-tmp & \
+				make -s clean-tmp & \
 				echo "SYNC_TMP_FOLDER ready, starting sync...";  \
 			time rsync -aHAXvPh \
 				--delete \
@@ -129,7 +129,7 @@ backup-root-template:
 	@${MAKE} -s rotate-backups
 	${MAKE}  sync-template  SYNC_TEMPLATE_VARIABLE=$(SYNC_TEMPLATE_VARIABLE)
 	@${MAKE} -s rotate-backups
-	@#${MAKE} -s clear-tmp
+	@#${MAKE} -s clean-tmp
 	@echo
 	@echo "Synchronization has been completed successfully... "
 	@date
