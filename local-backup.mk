@@ -19,6 +19,9 @@ test:
 	fi;
 
 
+init-local: init
+	@echo "init-local..."
+	
 init:
 	mkdir -p $(PROJECT_ROOT)/snapshots/$(LAST_COMPLETE_SYNC_FOLDER)
 	mkdir -p $(PROJECT_ROOT)/snapshots/tmp
@@ -30,15 +33,15 @@ clean-tmp:
 
 
 sync-template:
-	@if [[ "$(SYNC_TEMPLATE_VARIABLE)" == "remote" ]]; then \
-		make sync-remote ; \
+	@if [[ "$(SYNC_TEMPLATE_VARIABLE)" == "proxy" ]]; then \
+		make sync-proxy ; \
 	elif  [[ "$(SYNC_TEMPLATE_VARIABLE)" == "local" ]]; then \
 		make sync-local ; \
 	elif  [[ "$(SYNC_TEMPLATE_VARIABLE)" == "direct" ]]; then \
 		make sync-direct ; \
 	fi;
 
-sync-remote:
+sync-proxy:
 		if [[ ! -e $(PROJECT_ROOT)/snapshots/$(SYNC_COMPLETE_FOLDER) ]]; then \
 			if [[ ! -e $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) ]]; then \
 				if [[ -e $(PROJECT_ROOT)/snapshots/$(HARDLINKS_TMP_FOLDER) ]]; then \

@@ -86,6 +86,15 @@ backup-root: set-default-session
 		make -s backup-local-root; \
 	fi
 
+init: set-default-session
+	@if [[ -f $(DIRECT_SESSION) ]]; then \
+		make -s init-direct; \
+	elif [[ -f $(PROXY_SESSION) ]]; then \
+		make -s init-proxy; \
+	elif [[ -f $(LOCAL_SESSION) ]]; then \
+		make -s init-local; \
+	fi
+
 		
 check-for-project-root:
 	@if [[ -e $(PROJECT_ROOT)/snapshots ]]; then \
@@ -111,7 +120,7 @@ update:
 	@make -s auto-update
 
 init-all:
-	@make -s init-remote
+	@make -s init-proxy
 
 init-proxy:
 	@${MAKE} -s init
