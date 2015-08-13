@@ -116,19 +116,20 @@ auto-update:
 	fi;
 
 update:
-	rm $(NO_NEED_UPDATE_FLAG) 2> /dev/null; true
+	@echo "setting 'need for auto-update' flag..."
+	@rm $(NO_NEED_UPDATE_FLAG) 2> /dev/null; true
 	@make -s auto-update
 
 init-all:
 	@make -s init-proxy
 
 init-proxy:
-	@${MAKE} -s init
+	@${MAKE} -s init-common
 	@${MAKE} ssh-copy-user-id
 	@make -s common-action
 
 init-direct:
-	@${MAKE} -s init
+	@${MAKE} -s init-common
 	@${MAKE} ssh-copy-user-id-direct
 	@make -s common-action
 	

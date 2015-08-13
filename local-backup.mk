@@ -19,10 +19,9 @@ test:
 	fi;
 
 
-init-local: init
-	@echo "init-local..."
+init-local: init-common
 	
-init:
+init-common:
 	mkdir -p $(PROJECT_ROOT)/snapshots/$(LAST_COMPLETE_SYNC_FOLDER)
 	mkdir -p $(PROJECT_ROOT)/snapshots/tmp
 	@make -s common-action
