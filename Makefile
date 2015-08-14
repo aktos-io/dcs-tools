@@ -39,12 +39,12 @@ LOCAL_SESSION := session-type--local
 common-action:
 	@make -s check-for-project-root
 	@make -s auto-update
-	
-clean-session: 
+
+clean-session:
 	@rm $(DIRECT_SESSION) 2> /dev/null; true
 	@rm $(PROXY_SESSION) 2> /dev/null; true
 	@rm $(LOCAL_SESSION) 2> /dev/null; true
-	
+
 set-direct-session: clean-session
 	@echo "creating direct session..."
 	touch $(DIRECT_SESSION)
@@ -52,16 +52,16 @@ set-direct-session: clean-session
 set-proxy-session: clean-session
 	@echo "creating proxy session..."
 	touch $(PROXY_SESSION)
-	
+
 set-local-session: clean-session
 	@echo "creating local session..."
 	touch $(LOCAL_SESSION)
-	
-set-default-session: 
+
+set-default-session:
 	@if test ! -e $(DIRECT_SESSION) && test ! -e $(PROXY_SESSION) && test ! -e $(LOCAL_SESSION); then \
 		echo "no previous sessions found, setting default session..."; \
 		make -s set-direct-session; \
-	fi 
+	fi
 
 ssh: set-default-session
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
@@ -69,7 +69,7 @@ ssh: set-default-session
 	elif [[ -f $(PROXY_SESSION) ]]; then \
 		make -s ssh-proxy; \
 	fi
-		
+
 mount-root: set-default-session
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
 		make -s mount-root-direct; \
@@ -95,7 +95,7 @@ init: set-default-session
 		make -s init-local; \
 	fi
 
-		
+
 check-for-project-root:
 	@if [[ -e $(PROJECT_ROOT)/snapshots ]]; then \
 		echo "project root is correct"; \
@@ -132,7 +132,7 @@ init-direct:
 	@${MAKE} -s init-common
 	@${MAKE} ssh-copy-user-id-direct
 	@make -s common-action
-	
+
 
 
 mount-root-proxy: get-sshd-port
@@ -157,15 +157,15 @@ ssh-copy-user-id: get-sshd-port
 	ssh-copy-id -i $(SSH_KEY_FILE) -p $(TARGET_SSHD_PORT) $(NODE_USERNAME)@localhost
 	#ssh-copy-id -i $(SSH_KEY_FILE) -p $(TARGET_SSHD_PORT) root@localhost
 	ssh -o PasswordAuthentication=no root@$localhost -p $(TARGET_SSHD_PORT)  -i $(SSH_KEY_FILE) exit 0 || \
-	ssh -t -p $(TARGET_SSHD_PORT) root@localhost "echo $(PUBLIC_KEY) | sudo tee -a /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys" 
+	ssh -t -p $(TARGET_SSHD_PORT) root@localhost "echo $(PUBLIC_KEY) | sudo tee -a /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys"
 
 
 
-ssh-copy-user-id-direct: 
+ssh-copy-user-id-direct:
 	ssh -o PasswordAuthentication=no root@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT)  -i $(SSH_KEY_FILE) exit 0 || \
-	ssh -t -p $(NODE_LOCAL_SSHD_PORT) $(NODE_USERNAME)@$(NODE_LOCAL_IP) "echo $(PUBLIC_KEY) | sudo tee -a /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys" 
+	ssh -t -p $(NODE_LOCAL_SSHD_PORT) $(NODE_USERNAME)@$(NODE_LOCAL_IP) "sudo mkdir /root/.ssh 2> /dev/null; echo $(PUBLIC_KEY) | sudo tee -a /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys" 
 	ssh-copy-id -i $(SSH_KEY_FILE) -p $(NODE_LOCAL_SSHD_PORT) $(NODE_USERNAME)@$(NODE_LOCAL_IP)
-	
+
 
 get-sshd-port:
 	@make -s common-action
@@ -176,7 +176,7 @@ get-sshd-port:
 ssh-proxy: get-sshd-port
 	ssh $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT)
 
-ssh-direct: 
+ssh-direct:
 	ssh $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT)
 
 backup-remote-root-proxy:
@@ -195,5 +195,3 @@ backup-remote-root-direct:
 	@echo "Backup remote root folder here..."
 
 	sudo ${MAKE} backup-root-template SYNC_TEMPLATE_VARIABLE=direct
-
-
