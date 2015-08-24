@@ -29,8 +29,8 @@ ln -s project-tools/Makefile .
 	# select a session type (default: direct)
 	make set-[direct, proxy, local]-session 
 
-	# machine with link-with-server options: 
-	make init        	# for the first run
-	make mount-root         # mounts the root folder 
-	make ssh 	        # makes ssh
-	make backup-root 
+	# you have several action options: 
+	make init        	# only for the first run
+	make mount-root         # mounts the root folder to NODE_ROOT 
+	make ssh 	        # makes ssh 
+	make backup-root        # backups whole root partition 
