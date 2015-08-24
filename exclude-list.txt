@@ -1,8 +1,14 @@
 /home/*/.gvfs
 /home/*/.mozilla/firefox/*/Cache
-/home/*/.cache/chromium
 /home/*/.thumbnails
+/home/*/.local/share/gvfs-metadata
+/home/*/.Private                        # contains the actual encrypted home directory
+/home/*/.dbus                           # session-specific
+/home/*/.cache
+/home/*/.Trash                          # do I need to say more?
 /home/*/.local/share/Trash
+/home/*/.cddb                           # cached info about audio CDs
+/home/*/.aptitude                       # cached packages lists
 /var/run/*
 /var/lock/*
 /var/cache/apt/archives/*
