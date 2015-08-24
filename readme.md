@@ -27,7 +27,7 @@ ln -s project-tools/Makefile .
 	# edit the configuration file
 
 	# select a session type (default: direct)
-	make set-session-[direct, proxy, local] 
+	make set-[direct, proxy, local]-session 
 
 	# machine with link-with-server options: 
 	make init        	# for the first run
