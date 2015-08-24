@@ -30,7 +30,7 @@ ln -s project-tools/Makefile .
 	make set-[direct, proxy, local]-session 
 
 	# you have several action options: 
-	make init        	# only for the first run
+	make init               # only for the first run
 	make mount-root         # mounts the root folder to NODE_ROOT 
-	make ssh 	        # makes ssh 
+	make ssh                # makes ssh 
 	make backup-root        # backups whole root partition 
