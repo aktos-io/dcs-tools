@@ -44,3 +44,28 @@ Capabilities:
 	
 	# if you want to make it self-update on next run, remove the flag file: 
 	rm project-directory/project-tools/no-need-to-update-flag
+	
+# Advanced Tips
+
+If you keep your directory layout like: 
+
++ remote-machines
+  + machine-1
+    + project-tools
+    + Makefile
+    + snapshots
+    + ...
+  + machine-2
+    + aktos-dcs-tools (or whatever you named it)
+    + Makefile
+    + snapshots
+    + ...
+  + ...
+ 
+you can force all toolboxes update themselves on next run by issuing the following command: 
+
+```
+cd remote-machines 
+find . -maxdepth 3 -name "no-need-to-update*" -exec rm {} \;
+```
+
