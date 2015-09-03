@@ -27,6 +27,8 @@ Capabilities:
 
 	# create and edit the configuration file
 	./project-tools/configure
+	
+# Usage
 
 	# select a session type (default: direct)
 	make set-[direct, proxy, local]-session 
