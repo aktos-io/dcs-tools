@@ -159,17 +159,21 @@ umount-root:
 
 ssh-copy-user-id: get-sshd-port
 	ssh-copy-id -i $(SSH_KEY_FILE) -p $(TARGET_SSHD_PORT) $(NODE_USERNAME)@localhost
-	#ssh-copy-id -i $(SSH_KEY_FILE) -p $(TARGET_SSHD_PORT) root@localhost
 	ssh -o PasswordAuthentication=no root@$localhost -p $(TARGET_SSHD_PORT)  -i $(SSH_KEY_FILE) exit 0 || \
 	ssh -t -p $(TARGET_SSHD_PORT) root@localhost "echo $(PUBLIC_KEY) | sudo tee -a /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys"
 
-
-
 ssh-copy-user-id-direct:
-	ssh -o PasswordAuthentication=no root@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT)  -i $(SSH_KEY_FILE) exit 0 || \
-	ssh -t -p $(NODE_LOCAL_SSHD_PORT) $(NODE_USERNAME)@$(NODE_LOCAL_IP) "sudo mkdir /root/.ssh 2> /dev/null; echo $(PUBLIC_KEY) | sudo tee -a /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys" 
-	ssh-copy-id -i $(SSH_KEY_FILE) -p $(NODE_LOCAL_SSHD_PORT) $(NODE_USERNAME)@$(NODE_LOCAL_IP)
-
+	@echo "copying user id..."
+	ssh -o PasswordAuthentication=no root@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT)  -i $(SSH_KEY_FILE) exit 0 || { echo "ssh key will be registered for root and normal user by normal user..."; ssh -t -p $(NODE_LOCAL_SSHD_PORT) $(NODE_USERNAME)@$(NODE_LOCAL_IP) "sudo mkdir /root/.ssh 2> /dev/null; echo $(PUBLIC_KEY) | sudo tee -a /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys"; }
+	ssh -o PasswordAuthentication=no $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT)  -i $(SSH_KEY_FILE) exit 0 || { echo "ssh key will be registered for normal user by root..."; ssh -t -p $(NODE_LOCAL_SSHD_PORT) root@$(NODE_LOCAL_IP) 'echo naber; sudo -u '$(NODE_USERNAME)' bash -c  \"echo \\\"this is remote and i am `whoami` and node username: /home/$(NODE_USERNAME) \\\"; cd; mkdir -p /home/$(NODE_USERNAME)/.ssh; echo '$(PUBLIC_KEY)' | tee -a /home/$(NODE_USERNAME)/.ssh/authorized_keys | chmod 600 /home/$(NODE_USERNAME)/.ssh/authorized_keys \"'; }
+	@echo "checking if keys are installed correctly..."
+	ssh -o PasswordAuthentication=no $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT)  -i $(SSH_KEY_FILE) "exit 0" && \
+	ssh -o PasswordAuthentication=no root@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT)  -i $(SSH_KEY_FILE) "exit 0"
+	@if [[ "$$?" == "0" ]]; then \
+		echo "ssh id files installed successfully..."; \
+	else \
+		echo "ssh-copy-user-id-direct FAILED!"; \
+	fi; 
 
 get-sshd-port:
 	@make -s common-action
@@ -178,10 +182,10 @@ get-sshd-port:
 	sleep 5
 
 ssh-proxy: get-sshd-port
-	ssh $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT)
+	ssh $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT) $(SSH_ARGS)
 
 ssh-direct:
-	ssh $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT)
+	ssh $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT) $(SSH_ARGS)
 
 backup-remote-root-proxy:
 	@make -s common-action
