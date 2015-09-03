@@ -9,7 +9,7 @@ SHELL := /bin/bash
 # PWD that the main Makefile runs
 PROJECT_ROOT := $(THIS_DIR)
 
-SSH_KEY_FILE := /path/to/id_rsa
+SSH_KEY_FILE := /dev/null
 SERVER_USERNAME := username
 
 MOUNT_DIR := $(shell mktemp -d)
@@ -20,7 +20,8 @@ NODE_LOCAL_SSHD_PORT := 22
 NO_NEED_UPDATE_FLAG := $(TOOLS_DIR)/no-need-to-update-flag
 NODE_MOUNT_DIR_LINK_NAME := NODE_ROOT
 
-
+SSH := ssh -o ServerAliveInterval=5 -o ServerAliveCountMax=3
+SSHFS := sshfs -o reconnect -C -o workaround=all 
 
 export
 
@@ -141,13 +142,13 @@ init-direct:
 
 mount-root-proxy: get-sshd-port
 	@make -s common-action
-	sshfs -p $(TARGET_SSHD_PORT) $(NODE_USERNAME)@localhost:/ $(MOUNT_DIR)
+	$(SSHFS) -p $(TARGET_SSHD_PORT) $(NODE_USERNAME)@localhost:/ $(MOUNT_DIR)
 	rm  $(NODE_MOUNT_DIR_LINK_NAME) 2> /dev/null; true
 	ln -sf $(MOUNT_DIR) $(NODE_MOUNT_DIR_LINK_NAME)
 
 mount-root-direct:
 	@make -s common-action
-	sshfs -p $(NODE_LOCAL_SSHD_PORT) $(NODE_USERNAME)@$(NODE_LOCAL_IP):/ $(MOUNT_DIR)
+	$(SSHFS) -p $(NODE_LOCAL_SSHD_PORT) $(NODE_USERNAME)@$(NODE_LOCAL_IP):/ $(MOUNT_DIR)
 	rm  $(NODE_MOUNT_DIR_LINK_NAME) 2> /dev/null; true
 	ln -sf $(MOUNT_DIR) $(NODE_MOUNT_DIR_LINK_NAME)
 
@@ -165,11 +166,11 @@ ssh-copy-user-id-direct:
 
 ssh-copy-user-id-template:
 	@echo "copying user id..."
-	ssh -o PasswordAuthentication=no root@$(SSH_CONN_ADDR) -p $(SSH_CONN_PORT)  -i $(SSH_KEY_FILE) exit 0 || { echo "ssh key will be registered for root and normal user by normal user..."; ssh -t -p $(SSH_CONN_PORT) $(NODE_USERNAME)@$(SSH_CONN_ADDR) "sudo mkdir /root/.ssh 2> /dev/null; echo $(PUBLIC_KEY) | sudo tee -a /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys"; }
-	ssh -o PasswordAuthentication=no $(NODE_USERNAME)@$(SSH_CONN_ADDR) -p $(SSH_CONN_PORT)  -i $(SSH_KEY_FILE) exit 0 || { echo "ssh key will be registered for normal user by root..."; ssh -t -p $(SSH_CONN_PORT) root@$(SSH_CONN_ADDR) 'bash -c "sudo -u $(NODE_USERNAME) echo this is sudo $$USER; sudo -u $(NODE_USERNAME) mkdir -p /home/$(NODE_USERNAME)/.ssh; echo $(PUBLIC_KEY) |sudo -u $(NODE_USERNAME) tee -a /home/$(NODE_USERNAME)/.ssh/authorized_keys; sudo -u $(NODE_USERNAME) chmod 600 /home/$(NODE_USERNAME)/.ssh/authorized_keys "'; }
+	$(SSH) -o PasswordAuthentication=no root@$(SSH_CONN_ADDR) -p $(SSH_CONN_PORT)  -i $(SSH_KEY_FILE) exit 0 || { echo "ssh key will be registered for root and normal user by normal user..."; $(SSH) -t -p $(SSH_CONN_PORT) $(NODE_USERNAME)@$(SSH_CONN_ADDR) "sudo mkdir /root/.ssh 2> /dev/null; echo $(PUBLIC_KEY) | sudo tee -a /root/.ssh/authorized_keys; sudo chmod 600 /root/.ssh/authorized_keys"; }
+	$(SSH) -o PasswordAuthentication=no $(NODE_USERNAME)@$(SSH_CONN_ADDR) -p $(SSH_CONN_PORT)  -i $(SSH_KEY_FILE) exit 0 || { echo "ssh key will be registered for normal user by root..."; $(SSH) -t -p $(SSH_CONN_PORT) root@$(SSH_CONN_ADDR) 'bash -c "sudo -u $(NODE_USERNAME) echo this is sudo $$USER; sudo -u $(NODE_USERNAME) mkdir -p /home/$(NODE_USERNAME)/.ssh; echo $(PUBLIC_KEY) |sudo -u $(NODE_USERNAME) tee -a /home/$(NODE_USERNAME)/.ssh/authorized_keys; sudo -u $(NODE_USERNAME) chmod 600 /home/$(NODE_USERNAME)/.ssh/authorized_keys "'; }
 	@echo "checking if keys are installed correctly..."
-	ssh -o PasswordAuthentication=no $(NODE_USERNAME)@$(SSH_CONN_ADDR) -p $(SSH_CONN_PORT)  -i $(SSH_KEY_FILE) "exit 0" && \
-	ssh -o PasswordAuthentication=no root@$(SSH_CONN_ADDR) -p $(SSH_CONN_PORT)  -i $(SSH_KEY_FILE) "exit 0"
+	$(SSH) -o PasswordAuthentication=no $(NODE_USERNAME)@$(SSH_CONN_ADDR) -p $(SSH_CONN_PORT)  -i $(SSH_KEY_FILE) "exit 0" && \
+	$(SSH) -o PasswordAuthentication=no root@$(SSH_CONN_ADDR) -p $(SSH_CONN_PORT)  -i $(SSH_KEY_FILE) "exit 0"
 	@if [[ "$$?" == "0" ]]; then \
 		echo "ssh id files installed successfully..."; \
 	else \
@@ -179,14 +180,14 @@ ssh-copy-user-id-template:
 get-sshd-port:
 	@make -s common-action
 	@echo "getting sshd-port"
-	ssh $(SERVER_USERNAME)@ceremcem.net -L $(TARGET_SSHD_PORT):localhost:$(TARGET_SSHD_PORT) -N 2> /dev/null &
+	$(SSH) $(SERVER_USERNAME)@ceremcem.net -L $(TARGET_SSHD_PORT):localhost:$(TARGET_SSHD_PORT) -N 2> /dev/null &
 	sleep 5
 
 ssh-proxy: get-sshd-port
-	ssh $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT) $(SSH_ARGS)
+	$(SSH) $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT) $(SSH_ARGS)
 
 ssh-direct:
-	ssh $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT) $(SSH_ARGS)
+	$(SSH) $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT) $(SSH_ARGS)
 
 backup-remote-root-proxy:
 	@make -s common-action

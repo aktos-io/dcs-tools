@@ -64,8 +64,6 @@ sync-proxy:
 			mv $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/$(SYNC_COMPLETE_FOLDER);  \
 		fi;
 
-
-
 sync-direct:
 		if [[ ! -e $(PROJECT_ROOT)/snapshots/$(SYNC_COMPLETE_FOLDER) ]]; then \
 			if [[ ! -e $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) ]]; then \
@@ -89,7 +87,6 @@ sync-direct:
 				--rsh='ssh -p $(NODE_LOCAL_SSHD_PORT) -i $(SSH_KEY_FILE)' root@$(NODE_LOCAL_IP):/  $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) || { exit 1; } ;\
 			mv $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/$(SYNC_COMPLETE_FOLDER);  \
 		fi;
-
 
 sync-local:
 		if [[ ! -e $(PROJECT_ROOT)/snapshots/$(SYNC_COMPLETE_FOLDER) ]]; then \
