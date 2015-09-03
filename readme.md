@@ -15,16 +15,18 @@ Capabilities:
 
 # Install
 
-Preferably create a project directroy per device:
 
-```
-cd project-directory
-git clone https://github.com/ceremcem/aktos-dcs-tools project-tools
-ln -s project-tools/Makefile . 
-```
+	# move to your project/backup directory
+	cd project-directory
 
+	# clone (or download) repository
+	git clone https://github.com/ceremcem/aktos-dcs-tools project-tools
+	
+	# optionally set current directory as project directory (recommended)
+	ln -s project-tools/Makefile 
+
+	# create and edit the configuration file
 	./project-tools/configure
-	# edit the configuration file
 
 	# select a session type (default: direct)
 	make set-[direct, proxy, local]-session 
@@ -34,3 +36,6 @@ ln -s project-tools/Makefile .
 	make mount-root         # mounts the root folder to NODE_ROOT 
 	make ssh                # makes ssh 
 	make backup-root        # backups whole root partition 
+	
+	# whenever you need to update tools, run update: 
+	make update 
