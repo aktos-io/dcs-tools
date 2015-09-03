@@ -21,7 +21,7 @@ NO_NEED_UPDATE_FLAG := $(TOOLS_DIR)/no-need-to-update-flag
 NODE_MOUNT_DIR_LINK_NAME := NODE_ROOT
 
 SSH := ssh -o ServerAliveInterval=5 -o ServerAliveCountMax=3
-SSHFS := sshfs -o reconnect -C -o workaround=all 
+SSHFS := sshfs -o reconnect,ServerAliveInterval=5,ServerAliveCountMax=3 
 
 export
 
