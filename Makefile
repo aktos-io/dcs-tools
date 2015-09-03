@@ -68,6 +68,8 @@ ssh: set-default-session
 		make -s ssh-direct; \
 	elif [[ -f $(PROXY_SESSION) ]]; then \
 		make -s ssh-proxy; \
+	elif [[ -f $(LOCAL_SESSION) ]]; then \
+		echo "ERROR: this option makes no sense in local-session"; \
 	fi
 
 mount-root: set-default-session
@@ -75,6 +77,8 @@ mount-root: set-default-session
 		make -s mount-root-direct; \
 	elif [[ -f $(PROXY_SESSION) ]]; then \
 		make -s mount-root-proxy; \
+	elif [[ -f $(LOCAL_SESSION) ]]; then \
+		echo "ERROR: this option makes no sense in local-session"; \
 	fi
 
 backup-root: set-default-session
