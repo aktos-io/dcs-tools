@@ -39,6 +39,8 @@ Capabilities:
 	make ssh                # makes ssh 
 	make backup-root        # backups whole root partition 
 	
+# Tips 
+
 	# whenever you need to update tools, run update: 
 	make update 
 	
