@@ -1,4 +1,5 @@
 .bzr
 .bzrignore
 config.mk
+session-type--*
 *-flag
