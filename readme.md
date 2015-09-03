@@ -60,6 +60,12 @@ When making a backup, you can cancel at any point and resume later. All operatio
 	# if you want to make it self-update on next run, remove the flag file: 
 	rm project-directory/project-tools/no-need-to-update-flag
 	
+	# if you want to run a remote command, simply pass via ARGS= parameter
+	make ssh ARGS='uname -a'
+	
+	# to create a Local port forward: 
+	make ssh ARGS='-L 1234:localhost:5678'
+	
 # Advanced Tips
 
 If you keep your directory layout like: 
