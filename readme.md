@@ -39,3 +39,6 @@ Capabilities:
 	
 	# whenever you need to update tools, run update: 
 	make update 
+	
+	# if you want to make it self-update on next run, remove the flag file: 
+	rm project-directory/project-tools/no-need-to-update-flag
