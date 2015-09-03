@@ -71,3 +71,10 @@ cd remote-machines
 find . -maxdepth 3 -name "no-need-to-update*" -exec rm {} \;
 ```
 
+you can force all toolboxes update immediately: 
+
+```
+cd remote-machines 
+find . -type d -maxdepth 1 -exec sh -c '(echo {}; cd {} && make update)' ';'
+```
+
