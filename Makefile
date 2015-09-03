@@ -58,7 +58,7 @@ set-local-session: clean-session
 	@echo "creating local session..."
 	touch $(LOCAL_SESSION)
 
-set-default-session:
+set-default-session: common-action
 	@if test ! -e $(DIRECT_SESSION) && test ! -e $(PROXY_SESSION) && test ! -e $(LOCAL_SESSION); then \
 		echo "no previous sessions found, setting default session..."; \
 		make -s set-direct-session; \
