@@ -3,6 +3,7 @@
 This toolset is intended to use with remote Linux devices (embedded or not). You can:
 
 * make ssh
+* make ssh ARGS='-L 8080:localhost:1234' # port forward or remote code execution
 * make mount-root of target pc
 * make backup-root of target/local pc
 
