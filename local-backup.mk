@@ -20,7 +20,6 @@ test:
 
 
 init-local: 
-	@echo "init-local: calling init-common"
 	@make -s init-common
 	
 init-common:

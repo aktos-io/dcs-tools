@@ -65,7 +65,7 @@ set-default-session:
 	fi
 
 ssh: set-default-session
-	@make -s set-common-action
+	@make -s common-action
 
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
 		make -s ssh-direct; \
@@ -76,7 +76,7 @@ ssh: set-default-session
 	fi
 
 mount-root: set-default-session
-	@make -s set-common-action
+	@make -s common-action
 
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
 		make -s mount-root-direct; \
@@ -87,7 +87,7 @@ mount-root: set-default-session
 	fi
 
 backup-root: set-default-session
-	@make -s set-common-action
+	@make -s common-action
 
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
 		make -s backup-remote-root-direct; \
