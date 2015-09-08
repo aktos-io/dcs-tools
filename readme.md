@@ -43,12 +43,15 @@ When making a backup, you can cancel at any point and resume later. All operatio
 	
 # Usage
 
-	# select a session type (default: direct)
+	# REQUIRED: select a session type (default: direct)
 	make set-[direct, proxy, local]-session 
 
-	# you have several action options: 
-	make init               # only for the first run
-	make mount-root         # mounts the root folder to NODE_ROOT 
+	# REQUIRED: Run when switching to a session type for the first time 
+	make init
+	
+	# OPTIONS: you have several action options: 
+	make mount-root         # mounts the root folder to NODE_ROOT
+	make umount-root 	# unmount the root folder from NODE_ROOT 
 	make ssh                # makes ssh 
 	make backup-root        # backups whole root partition 
 	
