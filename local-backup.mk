@@ -19,7 +19,8 @@ test:
 	fi;
 
 
-init-local: init-common
+init-local: 
+	@make -s init-common
 	
 init-common:
 	mkdir -p $(PROJECT_ROOT)/snapshots/$(LAST_COMPLETE_SYNC_FOLDER)
