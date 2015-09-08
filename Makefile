@@ -9,7 +9,7 @@ SHELL := /bin/bash
 # PWD that the main Makefile runs
 PROJECT_ROOT := $(THIS_DIR)
 
-SSH_KEY_FILE := /dev/null
+SSH_KEY_FILE := /no/ssh/id/file/specified
 SERVER_USERNAME := username
 
 MOUNT_DIR := $(shell mktemp -d)
@@ -58,13 +58,15 @@ set-local-session: clean-session
 	@echo "creating local session..."
 	touch $(LOCAL_SESSION)
 
-set-default-session: common-action
+set-default-session: 
 	@if test ! -e $(DIRECT_SESSION) && test ! -e $(PROXY_SESSION) && test ! -e $(LOCAL_SESSION); then \
 		echo "no previous sessions found, setting default session..."; \
 		make -s set-direct-session; \
 	fi
 
 ssh: set-default-session
+	@make -s set-common-action
+
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
 		make -s ssh-direct; \
 	elif [[ -f $(PROXY_SESSION) ]]; then \
@@ -74,6 +76,8 @@ ssh: set-default-session
 	fi
 
 mount-root: set-default-session
+	@make -s set-common-action
+
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
 		make -s mount-root-direct; \
 	elif [[ -f $(PROXY_SESSION) ]]; then \
@@ -83,6 +87,8 @@ mount-root: set-default-session
 	fi
 
 backup-root: set-default-session
+	@make -s set-common-action
+
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
 		make -s backup-remote-root-direct; \
 	elif [[ -f $(PROXY_SESSION) ]]; then \
