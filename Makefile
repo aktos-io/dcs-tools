@@ -184,10 +184,10 @@ get-sshd-port:
 	sleep 5
 
 ssh-proxy: get-sshd-port
-	$(SSH) $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT) $(SSH_ARGS)
+	$(SSH) $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT) $(ARGS)
 
 ssh-direct:
-	$(SSH) $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT) $(SSH_ARGS)
+	$(SSH) $(NODE_USERNAME)@$(NODE_LOCAL_IP) -p $(NODE_LOCAL_SSHD_PORT) $(ARGS)
 
 backup-remote-root-proxy:
 	@make -s common-action
