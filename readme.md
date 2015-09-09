@@ -2,10 +2,10 @@
 
 This toolset is intended to use with remote Linux devices (embedded or not). You can:
 
-* make ssh
-* make ssh ARGS='-L 8080:localhost:1234' # port forward or remote code execution
-* make mount-root of target pc
-* make backup-root of target/local pc
+* `make ssh`
+* `make ssh ARGS='-L 8080:localhost:1234'` # port forward or remote code execution
+* `make mount-root` of target pc
+* `make backup-root` of target/local pc
 
 easily. There are 3 modes available: 
 
@@ -13,14 +13,14 @@ easily. There are 3 modes available:
 * proxy (via a rendezvous server) 
 * local (for making backups of localhost)
 
-Backups are: 
+Backups have following properties: 
 
 * incremental (only differences are transmitted) 
-* simple copies of original files (you can simply copy/paste when you need to restore)
-* versioned (you may increase this number)
-* small (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks)
+* dead simple copies of original files (you can simply copy/paste when you need to restore or move your files around)
+* versioned (you may increase number of versions as you wish, default history is 5 versions backwards)
+* efficient storage usage (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks)
 
-When making a backup, you can cancel at any point and resume later. All operations are resumable.
+When making a backup, you can cancel at any point and resume later. All operations (including folder rotations) are resumable.
 
 > Hint: You may use this toolset to take full incremental backups for your own computer: 
 >    
