@@ -1,13 +1,13 @@
 # aktos-dcs-tools 
 
-This toolset is intended to use with remote Linux devices (embedded or not). You can:
+This toolset is intended to use with remote Linux devices (embedded or not). You can easily do:
 
 * `make ssh`
 * `make ssh ARGS='-L 8080:localhost:1234'` # port forward or remote code execution
 * `make mount-root` of target pc
 * `make backup-root` of target/local pc
 
-easily. There are 3 modes available: 
+There are 3 connection modes available: 
 
 * direct (connected remote via local area network or a direct cable)
 * proxy (via a rendezvous server) 
@@ -28,6 +28,9 @@ When making a backup, you can cancel at any point and resume later. All operatio
 >      make set-session-local 
 >      make init 
 >      make backup-root
+
+
+> Note: Make sure that you are performing `make backup-root` commands on a native Linux filesystem. 
 
 # Install
 
@@ -89,14 +92,14 @@ If you keep your directory layout like:
     + ...
   + ...
  
-you can force all toolboxes update themselves on next run by issuing the following command: 
+You can **force** all toolboxes update themselves **on next run** by issuing the following command: 
 
 ```
 cd remote-machines 
 find . -maxdepth 3 -name "no-need-to-update*" -exec rm {} \;
 ```
 
-you can force all toolboxes update immediately: 
+You can **force** all toolboxes update **immediately**: 
 
 ```
 cd remote-machines 
