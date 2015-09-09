@@ -15,16 +15,18 @@ easily. There are 3 modes available:
 
 Backups have following properties: 
 
-* incremental (only differences are transmitted) 
-* dead simple copies of original files (you can simply copy/paste when you need to restore or move your files around)
-* versioned (you may increase number of versions as you wish, default history is 5 versions backwards)
-* efficient storage usage (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks)
+* **portable** (you can move your copies around. eg: take first backup locally, remove disk, mound on another computer, `make backup-root` again) 
+* **incremental** (only differences are transmitted) 
+* **dead simple copies** of original files (you can simply copy/paste when you need to restore or move your files around)
+* **versioned** (you may increase number of versions as you wish, default history is 5 versions backwards)
+* **efficient storage usage** (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks)
 
 When making a backup, you can cancel at any point and resume later. All operations (including folder rotations) are resumable.
 
 > Hint: You may use this toolset to take full incremental backups for your own computer: 
 >    
 >      make set-session-local 
+>      make init 
 >      make backup-root
 
 # Install
@@ -52,7 +54,7 @@ When making a backup, you can cancel at any point and resume later. All operatio
 	
 	# OPTIONS: you have several action options: 
 	make mount-root         # mounts the root folder to NODE_ROOT
-	make umount-root 	# unmount the root folder from NODE_ROOT 
+	make umount-root        # unmount the root folder from NODE_ROOT 
 	make ssh                # makes ssh 
 	make backup-root        # backups whole root partition 
 	
