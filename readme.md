@@ -41,9 +41,6 @@ When making a backup, you can cancel at any point and resume later. All operatio
 	# clone (or download) repository
 	git clone https://github.com/ceremcem/aktos-dcs-tools project-tools
 	
-	# optionally set current directory as project directory (recommended)
-	ln -s project-tools/Makefile 
-
 	# create and edit the configuration file
 	./project-tools/configure
 	
