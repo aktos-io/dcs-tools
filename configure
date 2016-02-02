@@ -1,7 +1,7 @@
 #!/bin/bash
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-ln -s "$DIR/Makefile" "$DIR/../Makefile"
+ln -sf "$DIR/Makefile" "$DIR/../Makefile"
 
 if [[ ! -e "$DIR/config.mk" ]]; then
   cp "$DIR/default-config.mk" "$DIR/config.mk"
