@@ -187,7 +187,9 @@ get-sshd-port:
 	@make -s common-action
 	@echo "getting sshd-port"
 	$(SSH) $(SERVER_USERNAME)@ceremcem.net -L $(TARGET_SSHD_PORT):localhost:$(TARGET_SSHD_PORT) -N 2> /dev/null &
-	sleep 5
+
+	# TODO: remove this sleep with a "CONNECTION OK" check
+	sleep 10
 
 ssh-proxy: get-sshd-port
 	$(SSH) $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT) $(ARGS)
