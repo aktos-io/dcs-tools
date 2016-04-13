@@ -1,14 +1,15 @@
 #!/bin/bash 
 
 
-# Checklist
 # ----------------------------------------------------
-# detect which device to format
-# create appropriate partitions
-# format these partitions with appropriate filesystems
-# mount partitions
-# copy files from backup to these mountpoints
-# INSTALL APPROPRIATE BOOTLOADER 
+# -- Checklist
+# ----------------------------------------------------
+# * detect device to format
+# * create appropriate partitions
+# * format these partitions with appropriate filesystems
+# * mount partitions
+# * copy files from backup to these mountpoints
+# * INSTALL APPROPRIATE BOOTLOADER (no need for RaspberryPi)
 #
 
 if [[ $(id -u) > 0 ]]; then 
@@ -26,29 +27,54 @@ debug_eval () {
     eval "$*"
 }
 
-# get correct device name
-echo "Plug/unplug the device and get the correct device name..."
-echo ""
-echo "Press Ctrl+C when you are done."
-###sleep 2
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-###watch "readlink -f /dev/disk/by-path/*"
+DEFAULT_DEVICE="/dev/mmcblk0"
+BACKUP="${DIR}/../snapshots/backup.last-0"
 
+clear 
+echo "Backup to be restored: ${BACKUP} "
+ls "${BACKUP}"
+pause
 
-###read -a DEVICE -p "Type the name of the device (eg. /dev/mmcblk0) : "
-
-DEVICE="/dev/mmcblk0"
-BACKUP="../snapshots/backup.last-0"
-
-###read -a OK_TO_GO -p "Device to format is $DEVICE. Is that correct? (yes/no)"
-
-# DEBUG
-OK_TO_GO="yes"
-
-if [[ "${OK_TO_GO}" != "yes" ]]; then
-    echo "I'll give you some time to think about it..."
-    exit
+read -a DEVICE -p "Device to be formatted (default: /dev/mmcblk0) : "
+if [[ "${DEVICE}" == "" ]]; then 
+	DEVICE=${DEFAULT_DEVICE}
 fi
+
+while true; do 
+
+	if [[ "${DEVICE}" == "" ]]; then 
+		# get correct device name
+		echo "Look correctly"
+		sleep 2
+		echo "Plug/unplug the device"
+		sleep 2
+		echo "Get the device name (eg. /dev/mmcblk0)"
+		sleep 2
+		echo "Press Ctrl+C when you are done."		
+		sleep 3
+		watch "readlink -f /dev/disk/by-path/*"
+		read -a DEVICE -p "Device to be formatted:"
+	fi
+
+	read -a OK_TO_GO -p "Device to format is $DEVICE. Is that correct? (yes/no)"
+	if [[ "${OK_TO_GO}" == "yes" ]]; then
+		break 
+	else
+		clear
+		DEVICE=""
+	fi
+
+done
+
+if [[ -b ${DEVICE} ]]; then 
+	echo "Using device: ${DEVICE}"
+	pause 
+else
+	echo "${DEVICE} does not exist..."
+	exit 2 
+fi 
 
 # device partitions
 BOOT_PART="${DEVICE}p1"
@@ -63,9 +89,7 @@ ROOT_MNT="${MOUNT_POINT}p2"
 umount ${BOOT_PART} 2> /dev/null
 umount ${ROOT_PART} 2> /dev/null
 
-echo "Will create partition table on the disk..."
-pause
-
+echo "Creating partition table on ${DEVICE}..."
 # to create the partitions programatically (rather than manually)
 # we're going to simulate the manual input to fdisk
 # The sed script strips off all the comments so that we can 
@@ -95,33 +119,25 @@ EOF
 
 
 echo "Creating filesystem on device partitions..."
-pause
 mkfs.vfat ${BOOT_PART}
 mkfs.ext4 ${ROOT_PART}
 
-echo "Creating mountpoints..."
-pause
+echo "Creating mountpoints: ${BOOT_MNT} and ${ROOT_MNT}"
 mkdir ${BOOT_MNT}
 mkdir ${ROOT_MNT}
 
-echo "Mounting and syncing DEVICE/boot and DEVICE/root directories..."
-pause
+echo "Mounting partitions..."
 mount ${BOOT_PART} ${BOOT_MNT}
 mount ${ROOT_PART} ${ROOT_MNT}
 
-
 echo "Restoring files from backup... (${BACKUP})"
-ls "${BACKUP}"
-pause
 rsync  -aHAXvPh "${BACKUP}/boot/" ${BOOT_MNT}
 rsync  -aHAXvPh --exclude "boot" "${BACKUP}/" ${ROOT_MNT}
-
 
 echo "Syncing..."
 sync
 
 echo "unmounting devices.."
-pause
 umount ${BOOT_PART}
 umount ${ROOT_PART}
 
