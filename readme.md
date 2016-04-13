@@ -1,4 +1,4 @@
-# aktos-dcs-tools 
+# Options
 
 This toolset is intended to use with remote Linux devices (embedded or not). You can easily:
 
@@ -8,12 +8,15 @@ This toolset is intended to use with remote Linux devices (embedded or not). You
 * `make backup-root` of target/local pc
 * `make create-disk-from-last-backup`
 
+# Connection types
+
 There are 3 connection modes available: 
 
 * direct (connected remote via local area network or a direct cable)
 * proxy (via a rendezvous server) 
 * local (for making backups of localhost)
 
+# Goals
 Backups have following properties: 
 
 * **portable** (you can move your copies around. eg: take first backup locally, remove disk, mound on another computer, `make backup-root` again) 
@@ -45,7 +48,7 @@ When making a backup, you can cancel at any point and resume later. All operatio
 	# create and edit the configuration file
 	./project-tools/configure
 	
-# Usage
+# Example Usage
 
 	# REQUIRED: select a session type (default: direct)
 	make set-[direct, proxy, local]-session 
@@ -61,16 +64,20 @@ When making a backup, you can cancel at any point and resume later. All operatio
 	
 # Tips 
 
-	# whenever you need to update tools, run update: 
+Whenever you need to update tools, run update: 
+	
 	make update 
 	
-	# if you want to make it self-update on next run, remove the flag file: 
+If you want to make it self-update on next run, remove the flag file: 
+	
 	rm project-directory/project-tools/no-need-to-update-flag
 	
-	# if you want to run a remote command, simply pass via ARGS= parameter
+If you want to run a remote command, simply pass via ARGS= parameter
+	
 	make ssh ARGS='uname -a'
 	
-	# to create a Local port forward: 
+To create a Local port forward: 
+	
 	make ssh ARGS='-L 1234:localhost:5678'
 	
 # Advanced Tips
