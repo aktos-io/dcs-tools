@@ -30,7 +30,7 @@ debug_eval () {
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 DEFAULT_DEVICE="/dev/mmcblk0"
-BACKUP="${DIR}/../snapshots/backup.last-0"
+BACKUP=$(readlink -f "${DIR}/../snapshots/backup.last-0")
 
 clear 
 echo "Backup to be restored: ${BACKUP} "
