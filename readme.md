@@ -1,11 +1,12 @@
 # aktos-dcs-tools 
 
-This toolset is intended to use with remote Linux devices (embedded or not). You can easily do:
+This toolset is intended to use with remote Linux devices (embedded or not). You can easily:
 
 * `make ssh`
 * `make ssh ARGS='-L 8080:localhost:1234'` # port forward or remote code execution
 * `make mount-root` of target pc
 * `make backup-root` of target/local pc
+* `make create-disk-from-last-backup`
 
 There are 3 connection modes available: 
 
