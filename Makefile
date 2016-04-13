@@ -97,6 +97,10 @@ backup-root: set-default-session
 		make -s backup-local-root; \
 	fi
 
+create-disk-from-last-backup: 
+	cd $(TOOLS_DIR) ;\
+	./create-disk-from-backup.sh
+
 init: set-default-session
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
 		make -s init-direct; \
