@@ -38,15 +38,11 @@ When making a backup, you can cancel at any point and resume later. All operatio
 
 # Install
 
+Follow these steps for a quick startup: 
 
-	# move to your project/backup directory
 	cd project-directory
-
-	# clone (or download) repository
-	git clone https://github.com/ceremcem/aktos-dcs-tools project-tools
-	
-	# create and edit the configuration file
-	./project-tools/configure
+	git clone https://github.com/aktos-io/aktos-dcs-tools
+	./aktos-dcs-tools/configure
 	
 # Example Usage
 
