@@ -72,35 +72,32 @@ pause
 # document what we're doing in-line with the actual commands
 # Note that a blank line (commented as "default" will send a empty
 # line terminated with a newline to take the fdisk default.
-#
-# ----------------------------------
-# WARNING: USE TABS FOR INDENTATION!
-# ----------------------------------
-#
-sed -e 's/\t\([\+0-9a-zA-Z]*\)[ \t].*/\1/' << EOF | fdisk ${DEVICE}
-	o # clear the in memory partition table
-	n # new partition
-	p # primary partition
-	1 # partition number 1
-	 # default - start at beginning of disk
-	+100M # 100 MB boot parttion
-	n # new partition
-	p # primary partition
-	2 # partion number 2
-	 # default, start immediately after preceding partition
-	 # default, extend partition to end of disk
-	a # make a partition bootable
-	1 # bootable partition is partition 1 -- /dev/sda1
-	p # print the in-memory partition table
-	w # write the partition table
-	q # and we're done
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${DEVICE}
+  o # clear the in memory partition table
+  n # new partition
+  p # primary partition
+  1 # partition number 1
+    # default - start at beginning of disk 
+  +110M # boot parttion
+  t # change the type (1st partition will be selected automatically)
+  c # Changed type of partition 'Linux' to 'W95 FAT32 (LBA)', mandatory for RaspberryPi
+  n # new partition
+  p # primary partition
+  2 # partion number 2
+    # default, start immediately after preceding partition
+    # default, extend partition to end of disk
+  a # make a partition bootable
+  1 # bootable partition is partition 1 -- /dev/sda1
+  p # print the in-memory partition table
+  w # write the partition table
+  q # and we're done
 EOF
 
 
 echo "Creating filesystem on device partitions..."
 pause
-echo y | mkfs.ext2 ${BOOT_PART}
-echo y | mkfs.ext4 ${ROOT_PART}
+mkfs.vfat ${BOOT_PART}
+mkfs.ext4 ${ROOT_PART}
 
 echo "Creating mountpoints..."
 pause
