@@ -16,6 +16,8 @@ MOUNT_DIR := $(shell mktemp -d)
 NODE_USERNAME := pi
 NODE_LOCAL_IP := 10.0.10.4
 NODE_LOCAL_SSHD_PORT := 22
+RENDEZVOUS_HOST := aktos.io
+RENDEZVOUS_PORT := 443
 
 NO_NEED_UPDATE_FLAG := $(TOOLS_DIR)/no-need-to-update-flag
 NODE_MOUNT_DIR_LINK_NAME := NODE_ROOT
@@ -190,7 +192,7 @@ ssh-copy-user-id-template:
 get-sshd-port:
 	@make -s common-action
 	@echo "getting sshd-port"
-	$(SSH) $(SERVER_USERNAME)@ceremcem.net -L $(TARGET_SSHD_PORT):localhost:$(TARGET_SSHD_PORT) -N 2> /dev/null &
+	$(SSH) $(SERVER_USERNAME)@$(RENDEZVOUS_HOST) -p $(RENDEZVOUS_PORT) -L $(TARGET_SSHD_PORT):localhost:$(TARGET_SSHD_PORT) -N 2> /dev/null &
 
 	# TODO: remove this sleep with a "CONNECTION OK" check
 	sleep 10
