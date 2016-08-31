@@ -22,8 +22,8 @@ RENDEZVOUS_PORT := 443
 NO_NEED_UPDATE_FLAG := $(TOOLS_DIR)/no-need-to-update-flag
 NODE_MOUNT_DIR_LINK_NAME := NODE_ROOT
 
-SSH := ssh -o ServerAliveInterval=5 -o ServerAliveCountMax=3
-SSHFS := sshfs -o reconnect,ServerAliveInterval=5,ServerAliveCountMax=3 
+SSH := ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3
+SSHFS := sshfs -o reconnect,ServerAliveInterval=60,ServerAliveCountMax=3
 
 export
 
@@ -60,7 +60,7 @@ set-local-session: clean-session
 	@echo "creating local session..."
 	touch $(LOCAL_SESSION)
 
-set-default-session: 
+set-default-session:
 	@if test ! -e $(DIRECT_SESSION) && test ! -e $(PROXY_SESSION) && test ! -e $(LOCAL_SESSION); then \
 		echo "no previous sessions found, setting default session..."; \
 		make -s set-direct-session; \
@@ -99,7 +99,7 @@ backup-root: set-default-session
 		make -s backup-local-root; \
 	fi
 
-create-disk-from-last-backup: 
+create-disk-from-last-backup:
 	cd $(TOOLS_DIR) ;\
 	./create-disk-from-backup.sh
 
@@ -187,15 +187,13 @@ ssh-copy-user-id-template:
 		echo "ssh id files installed successfully..."; \
 	else \
 		echo "ssh-copy-user-id-direct FAILED!"; \
-	fi; 
+	fi;
 
 get-sshd-port:
 	@make -s common-action
 	@echo "getting sshd-port"
-	$(SSH) $(SERVER_USERNAME)@$(RENDEZVOUS_HOST) -p $(RENDEZVOUS_PORT) -L $(TARGET_SSHD_PORT):localhost:$(TARGET_SSHD_PORT) -N 2> /dev/null &
-
-	# TODO: remove this sleep with a "CONNECTION OK" check
-	sleep 10
+	($(SSH) $(SERVER_USERNAME)@$(RENDEZVOUS_HOST) -p $(RENDEZVOUS_PORT) -f -o ExitOnForwardFailure=yes  -L $(TARGET_SSHD_PORT):localhost:$(TARGET_SSHD_PORT) sleep 70) 2> /dev/null || true 
+	@echo "got sshd-port!"
 
 ssh-proxy: get-sshd-port
 	$(SSH) $(NODE_USERNAME)@localhost -p $(TARGET_SSHD_PORT) $(ARGS)
