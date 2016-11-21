@@ -120,7 +120,9 @@ EOF
 
 echo "Creating filesystem on device partitions..."
 mkfs.vfat ${BOOT_PART}
-mkfs.ext4 ${ROOT_PART}
+# ext4 filesystem is problematic on Raspbian Jessie, so 
+# stick with ext3 for now
+mkfs.ext3 ${ROOT_PART}
 
 echo "Creating mountpoints: ${BOOT_MNT} and ${ROOT_MNT}"
 mkdir ${BOOT_MNT}
@@ -133,6 +135,7 @@ mount ${ROOT_PART} ${ROOT_MNT}
 echo "Restoring files from backup... (${BACKUP})"
 rsync  -aHAXvPh "${BACKUP}/boot/" ${BOOT_MNT}
 rsync  -aHAXvPh --exclude "boot" "${BACKUP}/" ${ROOT_MNT}
+mkdir "${ROOT_MNT}/boot"
 
 echo "Syncing..."
 sync
