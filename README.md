@@ -44,6 +44,24 @@ Follow these steps for a quick startup:
 	git clone https://github.com/aktos-io/aktos-dcs-tools
 	./aktos-dcs-tools/configure
 	
+# Configuration 
+
+>Local: Your computer. 
+>Node: Target Linux system in the field. 
+>Rendezvous server: The SSH server which has a public IP address that you use to get to the node's SSHD server. 
+
+Configuration options are as follows: 
+
+* `TARGET_SSHD_PORT` : SSHD port that the `node` has put on rendezvous server. 
+* `SSH_KEY_FILE` : Path to your ssh key file ([generate one](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) if you don't have)
+* `SERVER_USERNAME` : Your username at Rendezvous server
+* `MOUNT_DIR` : Mount directory definition that will be used when you `make mount-root`
+* `NODE_USERNAME` : Username on node 
+* `NODE_LOCAL_IP` : Node's local IP address that will be used to connect to when you `make set-direct-session`
+* `NODE_LOCAL_SSHD_PORT` : Node's local SSHD port (used when `make set-direct-session`)
+* `RENDEZVOUS_HOST` : Rendezvous host's ip address (or domain name)
+* `RENDEZVOUS_PORT` : Rendezvous host's SSHD port
+	
 # Example Usage
 
 	# REQUIRED: select a session type (default: direct)
