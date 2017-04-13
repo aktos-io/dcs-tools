@@ -16,7 +16,7 @@ There are 3 connection modes available:
 * proxy (via a rendezvous server) 
 * local (for making backups of localhost)
 
-# Goals
+# Advantages
 Backups have following properties: 
 
 * **portable** (you can move your copies around. eg: take first backup locally, remove disk, mound on another computer, `make backup-root` again) 
@@ -33,8 +33,10 @@ When making a backup, you can cancel at any point and resume later. All operatio
 >      make init 
 >      make backup-root
 
+# Disadvantages
 
-> Note: Make sure that you are performing `make backup-root` commands on a native Linux filesystem. 
+* Creating hardlinks for a 800GB backup may take hours
+* `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable during backup (your browser may start glitching while playing videos from web)
 
 # Install
 
@@ -61,7 +63,11 @@ Configuration options are as follows:
 * `NODE_LOCAL_SSHD_PORT` : Node's local SSHD port (used when `make set-direct-session`)
 * `RENDEZVOUS_HOST` : Rendezvous host's ip address (or domain name)
 * `RENDEZVOUS_PORT` : Rendezvous host's SSHD port
-	
+
+### BIG WARNING
+
+Make sure that you are performing `make backup-root` commands on a native Linux filesystem. 
+
 # Example Usage
 
 	# REQUIRED: select a session type (default: direct)
