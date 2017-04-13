@@ -10,6 +10,8 @@ PREV_VER_2 := backup.last-2
 PREV_VER_3 := backup.last-3
 PREV_VER_4 := backup.last-4
 
+RSYNC := nice -n19 ionice -c3 rsync
+
 
 test:
 	@if [[ $(shell id -u) > 0 ]]; then \
@@ -57,7 +59,7 @@ sync-proxy:
 				fi; \
 				make -s clean-tmp & \
 				echo "SYNC_TMP_FOLDER ready, starting sync..."; \
-			time rsync -aHAXvPh \
+			time $(RSYNC) -aHAXvPh \
 				--delete \
 				--delete-excluded \
 				--exclude-from $(TOOLS_DIR)/'exclude-list.txt' \
@@ -81,7 +83,7 @@ sync-direct:
 				fi; \
 				make -s clean-tmp & \
 				echo "SYNC_TMP_FOLDER ready, starting sync..."; \
-			time rsync -aHAXvPh \
+			time $(RSYNC) -aHAXvPh \
 				--delete \
 				--delete-excluded \
 				--exclude-from $(TOOLS_DIR)/'exclude-list.txt' \
@@ -105,7 +107,7 @@ sync-local:
 				fi; \
 				make -s clean-tmp & \
 				echo "SYNC_TMP_FOLDER ready, starting sync...";  \
-			time rsync -aHAXvPh \
+			time $(RSYNC) -aHAXvPh \
 				--delete \
 				--delete-excluded \
 				--exclude-from $(TOOLS_DIR)/'exclude-list.txt' \
