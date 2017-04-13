@@ -16,7 +16,7 @@ There are 3 connection modes available:
 * proxy (via a rendezvous server) 
 * local (for making backups of localhost)
 
-# Goals
+# Advantages
 Backups have following properties: 
 
 * **portable** (you can move your copies around. eg: take first backup locally, remove disk, mound on another computer, `make backup-root` again) 
@@ -32,6 +32,11 @@ When making a backup, you can cancel at any point and resume later. All operatio
 >      make set-session-local 
 >      make init 
 >      make backup-root
+
+# Disadvantages
+
+* Creating hardlinks for a 800GB backup may take hours
+* `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable during backup
 
 
 > Note: Make sure that you are performing `make backup-root` commands on a native Linux filesystem. 
