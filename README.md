@@ -38,9 +38,6 @@ When making a backup, you can cancel at any point and resume later. All operatio
 * Creating hardlinks for a 800GB backup may take hours
 * `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable during backup
 
-
-> Note: Make sure that you are performing `make backup-root` commands on a native Linux filesystem. 
-
 # Install
 
 Follow these steps for a quick startup: 
@@ -66,7 +63,11 @@ Configuration options are as follows:
 * `NODE_LOCAL_SSHD_PORT` : Node's local SSHD port (used when `make set-direct-session`)
 * `RENDEZVOUS_HOST` : Rendezvous host's ip address (or domain name)
 * `RENDEZVOUS_PORT` : Rendezvous host's SSHD port
-	
+
+### BIG WARNING
+
+Make sure that you are performing `make backup-root` commands on a native Linux filesystem. 
+
 # Example Usage
 
 	# REQUIRED: select a session type (default: direct)
