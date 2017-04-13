@@ -36,7 +36,7 @@ When making a backup, you can cancel at any point and resume later. All operatio
 # Disadvantages
 
 * Creating hardlinks for a 800GB backup may take hours
-* `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable during backup
+* `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable during backup (your browser may start glitching while playing videos from web)
 
 # Install
 
