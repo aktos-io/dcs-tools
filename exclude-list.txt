@@ -6,6 +6,7 @@
 /home/*/.dbus                           # session-specific
 /home/*/.cache
 /home/*/.Trash                          # do I need to say more?
+/home/**/.Trash-*
 /home/*/.local/share/Trash
 /home/*/.cddb                           # cached info about audio CDs
 /home/*/.aptitude                       # cached packages lists
