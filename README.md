@@ -21,7 +21,7 @@ Backups have following properties:
 
 * **portable** (you can move your copies around. eg: take first backup locally, remove disk, mound on another computer, `make backup-root` again) 
 * **incremental** (only differences are transmitted) 
-* **dead simple copies** of original files (you can simply copy/paste when you need to restore or move your files around)
+* **dead simple copies** of original files (you can simply copy/paste when you need to restore or move your files around) (this is also a **disadvantage, see below**)
 * **versioned** (you may increase number of versions as you wish, default history is 5 versions backwards)
 * **efficient storage usage** (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks)
 
@@ -32,11 +32,13 @@ When making a backup, you can cancel at any point and resume later. All operatio
 >      make set-session-local 
 >      make init 
 >      make backup-root
+>      # See disadvantages #2
 
 # Disadvantages
 
-* Creating hardlinks for a 800GB backup may take hours
-* `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable during backup (your browser may start glitching while playing videos from web)
+1. Creating hardlinks for a 800GB backup may take hours
+2. `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable (or unusable) during backup process (your browser may start glitching while playing videos from web) while performing a local backup. 
+3. Backups are just plain folders, which may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`**. 
 
 # Install
 
