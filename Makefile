@@ -8,6 +8,7 @@ THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 SHELL := /bin/bash
 # PWD that the main Makefile runs
 PROJECT_ROOT := $(THIS_DIR)
+LAST_ERR_LOG := last-errors.log
 
 SSH_KEY_FILE := /no/ssh/id/file/specified
 SERVER_USERNAME := username

@@ -63,7 +63,7 @@ sync-proxy:
 				--delete \
 				--delete-excluded \
 				--exclude-from $(TOOLS_DIR)/'exclude-list.txt' \
-				--rsh='ssh -p $(TARGET_SSHD_PORT) -i $(SSH_KEY_FILE)' root@localhost:/  $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) || { exit 1; } ;\
+				--rsh='ssh -p $(TARGET_SSHD_PORT) -i $(SSH_KEY_FILE)' root@localhost:/  $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) 2> $(LAST_ERR_LOG) || { exit 1; } ;\
 			mv $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/$(SYNC_COMPLETE_FOLDER);  \
 		fi;
 
@@ -87,7 +87,7 @@ sync-direct:
 				--delete \
 				--delete-excluded \
 				--exclude-from $(TOOLS_DIR)/'exclude-list.txt' \
-				--rsh='ssh -p $(NODE_LOCAL_SSHD_PORT) -i $(SSH_KEY_FILE)' root@$(NODE_LOCAL_IP):/  $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) || { exit 1; } ;\
+				--rsh='ssh -p $(NODE_LOCAL_SSHD_PORT) -i $(SSH_KEY_FILE)' root@$(NODE_LOCAL_IP):/  $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) 2> $(LAST_ERR_LOG) || { exit 1; } ;\
 			mv $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/$(SYNC_COMPLETE_FOLDER);  \
 		fi;
 
@@ -111,7 +111,7 @@ sync-local:
 				--delete \
 				--delete-excluded \
 				--exclude-from $(TOOLS_DIR)/'exclude-list.txt' \
-				--whole-file / $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER)/ || { exit 1; } ;\
+				--whole-file / $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER)/ 2> $(LAST_ERR_LOG) || { exit 1; } ;\
 			mv $(PROJECT_ROOT)/snapshots/$(SYNC_TMP_FOLDER) $(PROJECT_ROOT)/snapshots/$(SYNC_COMPLETE_FOLDER);  \
 		fi;
 

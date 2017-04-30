@@ -5,7 +5,8 @@
 /home/*/.Private                        # contains the actual encrypted home directory
 /home/*/.dbus                           # session-specific
 /home/*/.cache
-/home/*/.Trash                          # do I need to say more?
+/home/**/Default/Cache
+/home/*/.Trash                          
 /home/**/.Trash-*
 /home/*/.local/share/Trash
 /home/*/.cddb                           # cached info about audio CDs
@@ -24,4 +25,4 @@
 /lost+found
 /**/tmp
 *--no-sync
-/.*                                       # btrfs snapshot mount dir 
+/.*                                       # hidden files under root, eg. snapper snapshot dir
