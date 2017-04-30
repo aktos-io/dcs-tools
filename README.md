@@ -32,12 +32,13 @@ When making a backup, you can cancel at any point and resume later. All operatio
 >      make set-session-local 
 >      make init 
 >      make backup-root
+>      # See disadvantages #2
 
 # Disadvantages
 
-* Creating hardlinks for a 800GB backup may take hours
-* `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable (or unusable) during backup process (your browser may start glitching while playing videos from web) while performing a local backup. 
-* backups are just plain folders, which may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`**. 
+1. Creating hardlinks for a 800GB backup may take hours
+2. `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable (or unusable) during backup process (your browser may start glitching while playing videos from web) while performing a local backup. 
+3. Backups are just plain folders, which may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`**. 
 
 # Install
 
