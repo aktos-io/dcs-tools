@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
+safe_source () { source $1; set_dir; }
+set_dir
+
+safe_source $DIR/aktos-bash-lib/basic-functions.sh
+safe_source $DIR/aktos-bash-lib/ssh-functions.sh
+safe_source $DIR/common.sh
+
+params="$@"
+
+$SSH $NODE_USER@$NODE_IP -p $NODE_PORT -i $KEY_FILE $params
