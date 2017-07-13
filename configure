@@ -8,3 +8,5 @@ if [[ ! -e "$DIR/config.mk" ]]; then
 fi
 
 nano "$DIR/config.mk"
+
+touch "$DIR/no-need-to-update-flag"
