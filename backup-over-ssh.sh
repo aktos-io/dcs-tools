@@ -45,6 +45,14 @@ show_help () {
 HELP
 }
 
+die () {
+    errcho "ERROR: "
+    errcho "ERROR: $@"
+    errcho "ERROR: "
+    show_help
+    exit 255
+}
+
 while :; do
     case $1 in
         -h|-\?|--help)
