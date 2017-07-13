@@ -30,6 +30,7 @@ backup=
 device=
 fstype=
 verbose=0
+skip_format=false
 
 show_help () {
     cat <<HELP
@@ -40,9 +41,10 @@ show_help () {
 
     Options:
 
-    --backup     : backup directory
-    --device     : the device to format and create bootable disk
-    --fs-type    : target filesystem type (default ext3)
+    --backup        : backup directory
+    --device        : the device to format and create bootable disk
+    --fs-type       : target filesystem type (default ext3)
+    --skip-format   : skip formatting target disk, only rsync.
 
 HELP
 }
@@ -80,6 +82,9 @@ while :; do
         -v|--verbose)
             verbose=$((verbose + 1))  # Each -v adds 1 to verbosity.
             ;;
+        --skip-format)
+            skip_format=true
+            ;;
         -?*)
             printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
             ;;
@@ -90,6 +95,7 @@ while :; do
     shift
 done
 
+# check the arguments if they are valid
 if [[ ! -d $backup ]]; then
     die "Backup directory must be provided! (not a dir: $backup)"
 else
@@ -109,12 +115,17 @@ else
     echo_yellow "Using default $fstype type. "
 fi
 
+if [ $skip_format ]; then
+    echo_yellow "...will skip formatting..."
+fi
+
 if prompt_yes_no "Should we really continue?"; then
     echo_yellow "Bootable device $device will be built by using $backup"
 else
     echo_info "Interrupted by user."
     exit 0
 fi
+# end of check arguments 
 
 # -----------------------------------------------------------------------------
 #   All variables are set so far
@@ -137,50 +148,51 @@ echo "Using mount points: "
 echo "...Boot MNT: $BOOT_MNT"
 echo "...Root MNT: $ROOT_MNT"
 
-echo "Creating partition table on ${device}..."
-# to create the partitions programatically (rather than manually)
-# we're going to simulate the manual input to fdisk
-# The sed script strips off all the comments so that we can
-# document what we're doing in-line with the actual commands
-# Note that a blank line (commented as "default" will send a empty
-# line terminated with a newline to take the fdisk default.
-sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${device}
-  o # clear the in memory partition table
-  n # new partition
-  p # primary partition
-  1 # partition number 1
-    # default - start at beginning of disk
-  +110M # boot parttion
-  t # change the type (1st partition will be selected automatically)
-  c # Changed type of partition 'Linux' to 'W95 FAT32 (LBA)', mandatory for RaspberryPi
-  n # new partition
-  p # primary partition
-  2 # partion number 2
-    # default, start immediately after preceding partition
-    # default, extend partition to end of disk
-  a # make a partition bootable
-  1 # bootable partition is partition 1 -- /dev/sda1
-  p # print the in-memory partition table
-  w # write the partition table
-  q # and we're done
+if [ ! $skip_format ]; then
+    echo "Creating partition table on ${device}..."
+    # to create the partitions programatically (rather than manually)
+    # we're going to simulate the manual input to fdisk
+    # The sed script strips off all the comments so that we can
+    # document what we're doing in-line with the actual commands
+    # Note that a blank line (commented as "default" will send a empty
+    # line terminated with a newline to take the fdisk default.
+    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${device}
+      o # clear the in memory partition table
+      n # new partition
+      p # primary partition
+      1 # partition number 1
+        # default - start at beginning of disk
+      +110M # boot parttion
+      t # change the type (1st partition will be selected automatically)
+      c # Changed type of partition 'Linux' to 'W95 FAT32 (LBA)', mandatory for RaspberryPi
+      n # new partition
+      p # primary partition
+      2 # partion number 2
+        # default, start immediately after preceding partition
+        # default, extend partition to end of disk
+      a # make a partition bootable
+      1 # bootable partition is partition 1 -- /dev/sda1
+      p # print the in-memory partition table
+      w # write the partition table
+      q # and we're done
 EOF
 
 
-echo "Creating filesystem on device partitions..."
-mkfs.vfat ${BOOT_PART}
-# ext4 filesystem is problematic on Raspbian Jessie, so
-# stick with ext3 for now
-mkfs.$fstype ${ROOT_PART}
+    echo "Creating filesystem on device partitions..."
+    mkfs.vfat ${BOOT_PART}
+    # ext4 filesystem is problematic on Raspbian Jessie, so
+    # stick with ext3 for now
+    mkfs.$fstype ${ROOT_PART}
+fi
 
 echo "Mounting partitions..."
 mount ${BOOT_PART} ${BOOT_MNT}
 mount ${ROOT_PART} ${ROOT_MNT}
 
-
 echo "Restoring files from backup... (${backup})"
 rsync  -aHAXh "${backup}/boot/" ${BOOT_MNT}
 rsync  -aHAXh --exclude "boot" "${backup}/" ${ROOT_MNT}
-mkdir "${ROOT_MNT}/boot"
+mkdir -p "${ROOT_MNT}/boot"
 
 echo "Syncing..."
 sync
@@ -192,5 +204,10 @@ umount ${ROOT_PART}
 echo "Removing mountpoints..."
 rmdir ${BOOT_MNT}
 rmdir ${ROOT_MNT}
+
+echo_yellow "Do not forget to check the following files on target: "
+echo_yellow " * /boot/cmdline.txt"
+echo_yellow " * /etc/fstab"
+echo_yellow " * /etc/network/interfaces"
 
 echo_green "Done..."
