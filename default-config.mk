@@ -3,10 +3,11 @@
 
 # REQUIRED
 # ----------------------------------------
-#TARGET_SSHD_PORT := 7015 
 #SSH_KEY_FILE := /home/ceremcem/.ssh/id_rsa
-#SERVER_USERNAME := ceremcem
 # ----------------------------------------
+
+#TARGET_SSHD_PORT := 7015
+#SERVER_USERNAME := ceremcem
 
 # MOUNT_DIR := $(shell mktemp -d)
 # NODE_USERNAME := pi
