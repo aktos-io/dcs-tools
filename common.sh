@@ -5,6 +5,8 @@ safe_source () { source $1; set_dir; }
 set_dir
 
 safe_source $DIR/config.sh
+safe_source $DIR/aktos-bash-lib/basic-functions.sh
+safe_source $DIR/aktos-bash-lib/ssh-functions.sh
 
 [ $NODE_USER ] || NODE_USER="aea"
 [ $KEY_FILE ] || KEY_FILE="$HOME/.ssh/id_rsa"

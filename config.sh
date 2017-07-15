@@ -1,18 +1,15 @@
-# Common settings
-# ------------------------------------
-#NODE_USER="aea"
-#KEY_FILE="/home/ceremcem/.ssh/id_rsa"
-#MOUNT_DIR=$(mktemp -d)
-
 # Direct (on LAN) connection settings:
 # ------------------------------------
-#NODE_IP="10.0.8.2"
-NODE_IP="10.0.10.131"
+NODE_IP="10.0.8.2"
+#NODE_IP="10.0.10.130"
+
 #NODE_PORT=22
+#NODE_USER="aea"
+#KEY_FILE="/$HOME/.ssh/id_rsa"
+#MOUNT_DIR=$(mktemp -d)
+
 
 # Proxy connection settings
 # ------------------------------------
-#RENDEZVOUS_USER="ceremcem"
-#RENDEZVOUS_HOST="aktos.io"
-#RENDEZVOUS_PORT=443
-#NODE_RENDEZVOUS_PORT=7039
+SSH_SOCKET_FILE="/tmp/ssh-mobmac2@aktos.io:443.sock"
+NODE_RENDEZVOUS_PORT=7101

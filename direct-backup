@@ -1,0 +1,7 @@
+#!/bin/bash
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
+safe_source () { source $1; set_dir; }
+set_dir
+
+safe_source $DIR/common.sh
+$DIR/backup-over-ssh.sh --source $NODE_USER@$NODE_IP:$NODE_PORT/ --backup $DIR/../snapshots/curr
