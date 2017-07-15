@@ -1,0 +1,15 @@
+#!/bin/bash
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
+safe_source () { source $1; set_dir; }
+set_dir
+safe_source $DIR/common.sh
+
+actual_dir=$(readlink $NODE_MOUNT_LINK)
+if [[ $actual_dir ]]; then
+    fusermount -u $(readlink $NODE_MOUNT_LINK)
+    rmdir $(readlink $NODE_MOUNT_LINK)
+    rm $NODE_MOUNT_LINK
+    echo_green "umount done."
+else
+    echo_yellow "seems already umounted."
+fi

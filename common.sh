@@ -21,3 +21,5 @@ if [ $RENDEZVOUS_HOST ]; then
     [ $NODE_RENDEZVOUS_PORT ] || die "Target node's sshd port on rendezvous server is required"
     echo_green "Using rendezvous server: $RENDEZVOUS_USER@$RENDEZVOUS_HOST:$RENDEZVOUS_PORT -> $NODE_RENDEZVOUS_PORT"
 fi
+
+NODE_MOUNT_LINK="$DIR/../NODE_ROOT"

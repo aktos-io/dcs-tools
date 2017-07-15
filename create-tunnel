@@ -1,0 +1,10 @@
+#!/bin/bash
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
+safe_source () { source $1; set_dir; }
+set_dir
+safe_source $DIR/common.sh
+
+echo_green "Using proxy connection: $SSH_SOCKET_FILE"
+ssh_run_via_socket -L $NODE_RENDEZVOUS_PORT:localhost:$NODE_RENDEZVOUS_PORT
+echo "port forward pid: $last_pid"
+sleep 1
