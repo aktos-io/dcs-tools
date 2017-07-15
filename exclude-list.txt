@@ -13,6 +13,7 @@
 /home/*/.aptitude                       # cached packages lists
 /var/run/*
 /var/lock/*
+/var/log/*
 /var/swap
 /var/cache
 /var/cache/apt/archives/*
