@@ -125,7 +125,7 @@ else
     echo_info "Interrupted by user."
     exit 0
 fi
-# end of check arguments 
+# end of check arguments
 
 # -----------------------------------------------------------------------------
 #   All variables are set so far
@@ -209,5 +209,6 @@ echo_yellow "Do not forget to check the following files on target: "
 echo_yellow " * /boot/cmdline.txt"
 echo_yellow " * /etc/fstab"
 echo_yellow " * /etc/network/interfaces"
+echo_yellow " * attributes of /etc/resolv.conf"
 
 echo_green "Done..."
