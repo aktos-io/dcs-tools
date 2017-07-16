@@ -21,3 +21,10 @@ if [ $RENDEZVOUS_HOST ]; then
 fi
 
 NODE_MOUNT_LINK="$DIR/../NODE_ROOT"
+
+known_hosts_file=$(realpath $DIR/../known_hosts)
+touch $known_hosts_file
+custom_known_hosts="-o UserKnownHostsFile=$known_hosts_file"
+
+SSH="$SSH $custom_known_hosts"
+SSHFS="$SSHFS $custom_known_hosts"
