@@ -5,6 +5,5 @@ set_dir
 safe_source $DIR/common.sh
 
 echo_green "Using proxy connection: $SSH_SOCKET_FILE"
-ssh_run_via_socket -L $NODE_RENDEZVOUS_PORT:localhost:$NODE_RENDEZVOUS_PORT
-echo "port forward pid: $last_pid"
+ssh_socket_make_forward -L $NODE_RENDEZVOUS_PORT:localhost:$NODE_RENDEZVOUS_PORT
 sleep 1
