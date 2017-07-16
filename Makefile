@@ -31,9 +31,9 @@ use-proxy-session: .clean-session
 
 ssh: .check-session
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
-		$(TOOLS_DIR)/ssh-direct; \
+		$(TOOLS_DIR)/ssh-direct $(ARGS); \
 	elif [[ -f $(PROXY_SESSION) ]]; then \
-		$(TOOLS_DIR)/ssh-proxy; \
+		$(TOOLS_DIR)/ssh-proxy $(ARGS); \
 	fi
 
 mount-root: .check-session
