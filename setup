@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 ln -sf "./$(basename $DIR)/Makefile" "$DIR/../Makefile"
@@ -10,3 +10,4 @@ else
   echo "There is a configuration file already"
 fi
 
+touch "$DIR/../up-to-date"

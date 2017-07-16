@@ -10,10 +10,18 @@ PROJECT_ROOT := $(THIS_DIR)
 DIRECT_SESSION := using-direct-connection
 PROXY_SESSION := using-proxy-connection
 
+UP_TO_DATE := up-to-date
 
-.check-session:
+.check-update-needs:
+	@if [[ ! -f $(UP_TO_DATE) ]]; then \
+		echo "!!! No $(UP_TO_DATE) flag found"; \
+		$(TOOLS_DIR)/update.sh; \
+		touch $(UP_TO_DATE); \
+	fi
+
+.check-session: .check-update-needs
 	@if [[ ! -f $(DIRECT_SESSION) ]] && [[ ! -f $(PROXY_SESSION) ]]; then \
-		echo "No appropriate session found. Set session type first."; \
+		echo "!!! No appropriate session found. Set session type first."; \
 		exit 255; \
 	fi
 
@@ -52,3 +60,6 @@ sync-root: .check-session
 	elif [[ -f $(PROXY_SESSION) ]]; then \
 		$(TOOLS_DIR)/sync-proxy; \
 	fi
+
+update:
+	$(TOOLS_DIR)/update.sh
