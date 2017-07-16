@@ -1,0 +1,12 @@
+#!/bin/bash 
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+ln -sf "./$(basename $DIR)/Makefile" "$DIR/../Makefile"
+
+if [[ ! -e "$DIR/config.sh" ]]; then
+  cp "$DIR/config-template.sh" "$DIR/config.sh"
+  nano "$DIR/config.sh"
+else
+  echo "There is a configuration file already"
+fi
+
