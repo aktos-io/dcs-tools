@@ -1,0 +1,16 @@
+#!/bin/bash
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }; set_dir
+safe_source () { source $1; set_dir; }
+safe_source $DIR/common.sh
+
+proxy_port=$1
+[[ $proxy_port ]] || proxy_port=$NODE_RENDEZVOUS_PORT
+
+echo "Using ssh socket: $SSH_SOCKET_FILE, creating tunnel to localhost:$proxy_port"
+ssh_socket_make_forward -L $proxy_port:localhost:$proxy_port
+if is_sshd_heartbeating localhost $proxy_port; then
+    echo_green "Connect target machine via localhost:$proxy_port"
+else
+    echo_yellow "Something went wrong!"
+    exit 255
+fi

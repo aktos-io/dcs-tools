@@ -17,11 +17,7 @@ set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
 safe_source () { source $1; set_dir; }
 set_dir
 
-if [[ $(id -u) > 0 ]]; then
-    #echo "This script needs root privileges..."
-    sudo $0 "$@"
-    exit
-fi
+if [[ $(id -u) > 0 ]]; then sudo $0 "$@"; exit; fi
 
 safe_source $DIR/aktos-bash-lib/basic-functions.sh
 safe_source $DIR/aktos-bash-lib/fs-functions.sh
@@ -30,7 +26,15 @@ backup=
 device=
 fstype=
 verbose=0
-skip_format=false
+skip_format=
+
+die () {
+    errcho "ERROR: "
+    errcho "ERROR: $@"
+    errcho "ERROR: "
+    show_help
+    exit 5
+}
 
 show_help () {
     cat <<HELP
@@ -125,7 +129,7 @@ else
     echo_info "Interrupted by user."
     exit 0
 fi
-# end of check arguments 
+# end of check arguments
 
 # -----------------------------------------------------------------------------
 #   All variables are set so far
@@ -209,5 +213,6 @@ echo_yellow "Do not forget to check the following files on target: "
 echo_yellow " * /boot/cmdline.txt"
 echo_yellow " * /etc/fstab"
 echo_yellow " * /etc/network/interfaces"
+echo_yellow " * attributes of /etc/resolv.conf"
 
 echo_green "Done..."

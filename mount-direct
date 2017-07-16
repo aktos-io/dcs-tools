@@ -1,0 +1,8 @@
+#!/bin/bash
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }; set_dir
+safe_source () { source $1; set_dir; }
+safe_source $DIR/common.sh
+
+$SSHFS -p $NODE_PORT $NODE_USER@$NODE_IP:/ $MOUNT_DIR
+rm $NODE_MOUNT_LINK 2> /dev/null
+ln -sf $MOUNT_DIR $NODE_MOUNT_LINK

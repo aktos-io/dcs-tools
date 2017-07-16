@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# This script initializes for making passwordless
+#
+#   * backup
+#   * ssh
+#
+# operations
+set -e
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }; set_dir
+safe_source () { source $1; set_dir; }
+
+safe_source $DIR/aktos-bash-lib/basic-functions.sh
+safe_source $DIR/aktos-bash-lib/ssh-functions.sh
+
+show_help () {
+    cat <<HELP
+
+    Usage:
+
+        $(basename $0) --target ssh://user@host[:port] --id-file path/to/id_rsa
+
+    Example:
+
+        ./$(basename $0) --target ssh://aea@localhost:7103 --id-file ~/.ssh/id_rsa
+
+HELP
+}
+
+die () {
+    errcho "ERROR: "
+    errcho "ERROR: $@"
+    errcho "ERROR: "
+    show_help
+    exit 255
+}
+
+source=
+id_file=
+while :; do
+    case $1 in
+        -h|-\?|--help)
+            show_help    # Display a usage synopsis.
+            exit
+            ;;
+        --target)       # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                target=$2
+                shift
+            else
+                die '"--target" requires a non-empty option argument.'
+            fi
+            ;;
+        --id-file)
+            if [ "$2" ]; then
+                SSH_KEY_FILE=$2
+                shift
+            else
+                die '"--id-file" requires a non-empty option argument.'
+            fi
+            ;;
+        -?*)
+            printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+            ;;
+        *)               # Default case: No more options, so break out of the loop.
+            break
+    esac
+
+    shift
+done
+
+if [[ ! -f $SSH_KEY_FILE ]]; then
+    die "No such ID file: $SSH_KEY_FILE"
+fi
+
+if [ ! $target ]; then
+    die "SSH address is required."
+fi
+
+SSH_PORT=$(parse_url port $target)
+SSH_HOST=$(parse_url host $target)
+SSH_USER=$(parse_url user $target)
+SSH_PATH=$(parse_url path $target)
+
+# defaults
+[ $SSH_PORT ] || SSH_PORT="22"
+
+echo_green "Using target: $target, user: $SSH_USER, addr: $SSH_HOST, port: $SSH_PORT, id file: $SSH_KEY_FILE"
+
+echo "Copying ssh key file to target host"
+if check_ssh_key; then
+    echo "=== Key file is already installed on target host."
+else
+    echo_yellow "Key file will be installed!"
+    PUBLIC_KEY=$(get_public_key $SSH_KEY_FILE)
+    $SSH $SSH_USER@$SSH_HOST -p $SSH_PORT \
+    "export KEY='$PUBLIC_KEY'" '; bash -s' <<'ENDSSH'
+        # commands to run on remote host
+        AUTHORIZED_KEYS_FILE="$HOME/.ssh/authorized_keys"
+
+        # create needed files and directories if not exists:
+        mkdir -p $(dirname "$AUTHORIZED_KEYS_FILE")
+        touch "$AUTHORIZED_KEYS_FILE"
+
+        echo "-------public key--------"
+        echo $KEY
+        echo "-------------------------"
+
+        grep "$KEY" $AUTHORIZED_KEYS_FILE > /dev/null
+        if [[ $? -eq 0 ]]; then
+            echo "!!!! Public key already exists (but we should have checked this before!)"
+        else
+            echo "+++ Adding public key to $AUTHORIZED_KEYS_FILE file"
+            echo $KEY >> $AUTHORIZED_KEYS_FILE
+        fi
+ENDSSH
+fi
+
+# user should be able to run rsync with sudo without password
+mycmd=`cat <<'EOF'
+    SUDOERS_LINE="$SUDO_USER ALL=(ALL) NOPASSWD: /usr/bin/rsync";
+    if ! sudo grep "$SUDOERS_LINE" /etc/sudoers > /dev/null; then
+        echo "+++ Adding rsync authorization line in /etc/sudoers";
+        echo $SUDOERS_LINE >> /etc/sudoers;
+    else
+        echo "=== rsync is already authorized to run without password.";
+    fi
+EOF
+`
+cmd_encoded=$(echo $mycmd | base64 -w0)
+ssh_id_command "echo $cmd_encoded | base64 -d | sudo bash"
+
+echo_green "Remote target is initialized."

@@ -1,5 +1,1 @@
-.bzr
-.bzrignore
-config.mk
-session-type--*
-*-flag
+config.sh

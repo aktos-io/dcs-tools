@@ -1,0 +1,12 @@
+#!/bin/bash
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
+safe_source () { source $1; set_dir; }
+set_dir
+safe_source $DIR/common.sh
+
+$DIR/create-tunnel
+params="$@"
+if [[ $params ]]; then
+    echo_yellow "params: $params"
+fi
+$SSH $NODE_USER@localhost -p $NODE_RENDEZVOUS_PORT -i $KEY_FILE $params

@@ -1,0 +1,106 @@
+#!/bin/bash
+set -e
+
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }; set_dir
+safe_source () { source $1; set_dir; }
+
+if [[ $(id -u) > 0 ]]; then sudo $0 "$@"; exit; fi
+
+safe_source $DIR/aktos-bash-lib/basic-functions.sh
+safe_source $DIR/aktos-bash-lib/fs-functions.sh
+safe_source $DIR/aktos-bash-lib/btrfs-functions.sh
+
+show_help () {
+    cat <<HELP
+
+    Usage:
+
+        $(basename $0) ...options...
+
+    Options:
+
+    --source         : source directory for backup
+    --backups        : backup container directory
+    --method         : method for backup. One of:
+
+                        * hardlinks
+                        * btrfs
+
+HELP
+}
+
+die () {
+    errcho "ERROR: "
+    errcho "ERROR: $@"
+    errcho "ERROR: "
+    show_help
+    exit 255
+}
+
+source_dir=
+backup_dir=
+method=
+while :; do
+    case $1 in
+        -h|-\?|--help)
+            show_help    # Display a usage synopsis.
+            exit
+            ;;
+        --source)       # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                source_dir=$(realpath $2)
+                shift
+            else
+                die '"--source" requires a non-empty option argument.'
+            fi
+            ;;
+        --backups)       # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                backup_dir=$(realpath $2)
+                shift
+            else
+                die '"--backups" requires a non-empty option argument.'
+            fi
+            ;;
+        --method)       # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                method=$2
+                shift
+            else
+                die '"--method" requires a non-empty option argument.'
+            fi
+            ;;
+        -?*)
+            printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+            ;;
+        *)               # Default case: No more options, so break out of the loop.
+            break
+    esac
+
+    shift
+done
+
+[[ "$method" == "hardlinks" ]] || [[ "$method" == "btrfs" ]] || die "method is required."
+[[ -d $backup_dir ]] || die "backups should be a directory."
+[[ -d $source_dir ]] || die "source should be a directory."
+
+prefix=$(get_timestamp)
+comment="no-comment"
+backup_name="$prefix-$comment"
+tmp_name="work-in-progress-$backup_name"
+
+start_timer
+if [[ "$method" == "hardlinks" ]]; then
+    if ls $backup_dir/work-in-progress* 1> /dev/null 2>&1; then
+        echo_err "work in progress directories found. Remove them first."
+    fi
+    echo "Creating backup with the following name: $backup_name"
+    echo "Using hardlinks method"
+    echo_err "FIXME: invalid cross-device link error on btrfs filesystem. Below code is still tested well."
+    cp -al $source_dir $backup_dir/$tmp_name
+    mv $backup_dir/$tmp_name $backup_dir/$backup_name
+elif [[ "$method" == "btrfs" ]]; then
+    is_btrfs_subvolume $source_dir || die "Source should be BTRFS subvolume."
+    btrfs sub snap -r "$source_dir" "$backup_dir/$backup_name"
+fi
+show_timer "Backup completed in:"
