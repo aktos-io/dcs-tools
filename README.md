@@ -1,6 +1,3 @@
-To use proxy mode, the development machine (which the `dcs-tools` are installed into)
-is assumed to use `link-with-server` already.
-
 # Options
 
 This toolset is intended to use with remote Linux devices (embedded or not). You can easily:
@@ -8,16 +5,15 @@ This toolset is intended to use with remote Linux devices (embedded or not). You
 * `make ssh`
 * `make ssh ARGS='-L 8080:localhost:1234'` # port forward or remote code execution
 * `make mount-root` of target pc
-* `make backup-root` of target/local pc
-* `make create-disk-from-last-backup`
+* `make sync-root` of target pc
+* `produce-bootable-disk` from any backup folder
 
 # Connection types
 
-There are 3 connection modes available:
+There are 2 connection modes available:
 
-* direct (connected remote via local area network or a direct cable)
-* proxy (via a rendezvous server)
-* local (for making backups of localhost)
+* direct : connected to remote target via local area network, a direct cable or directly over internet
+* proxy  : connected to remote target via a rendezvous server
 
 # Advantages
 Backups have following properties:
@@ -25,67 +21,45 @@ Backups have following properties:
 * **portable** (you can move your copies around. eg: take first backup locally, remove disk, mound on another computer, `make backup-root` again)
 * **incremental** (only differences are transmitted)
 * **dead simple copies** of original files (you can simply copy/paste when you need to restore or move your files around) (this is also a **disadvantage, see below**)
-* **versioned** (you may increase number of versions as you wish, default history is 5 versions backwards)
-* **efficient storage usage** (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks)
+* **versioned** : Take any number of full backups as much as you like. You are responsible for deleting old backups.
+* **efficient storage usage** (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks or BTRFS subvolumes)
 
-When making a backup, you can cancel at any point and resume later. All operations (including folder rotations) are resumable.
-
-> Hint: You may use this toolset to take full incremental backups for your own computer:
->    
->      make set-session-local
->      make init
->      make backup-root
->      # See disadvantages #2
+When making a backup, you can cancel at any point and resume later.
 
 # Disadvantages
 
-1. Creating hardlinks for a 800GB backup may take hours
-2. `rsync` process may consume lots of CPU and IO resources, so your desktop becomes less usable (or unusable) during backup process (your browser may start glitching while playing videos from web) while performing a local backup.
-3. Backups are just plain folders, which may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`**.
+If you are not using **btrfs**, following problem will bite you:
+
+Backups are just plain folders, which may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`**.
 
 # Install
 
 Follow these steps for a quick startup:
 
 	cd project-directory
-	git clone https://github.com/aktos-io/aktos-dcs-tools
-	./aktos-dcs-tools/configure
+	git clone https://github.com/aktos-io/dcs-tools
+	./dcs-tools/setup
 
-# Configuration
+# BIG WARNING
 
->Local: Your computer.
->Node: Target Linux system in the field.
->Rendezvous server: The SSH server which has a public IP address that you use to get to the node's SSHD server.
-
-Configuration options are as follows:
-
-* `TARGET_SSHD_PORT` : SSHD port that the `node` has put on rendezvous server.
-* `SSH_KEY_FILE` : Path to your ssh key file ([generate one](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) if you don't have)
-* `SERVER_USERNAME` : Your username at Rendezvous server
-* `MOUNT_DIR` : Mount directory definition that will be used when you `make mount-root`
-* `NODE_USERNAME` : Username on node
-* `NODE_LOCAL_IP` : Node's local IP address that will be used to connect to when you `make set-direct-session`
-* `NODE_LOCAL_SSHD_PORT` : Node's local SSHD port (used when `make set-direct-session`)
-* `RENDEZVOUS_HOST` : Rendezvous host's ip address (or domain name)
-* `RENDEZVOUS_PORT` : Rendezvous host's SSHD port
-
-### BIG WARNING
-
-Make sure that you are performing `make backup-root` commands on a native Linux filesystem.
+Make sure that you are performing `make sync-root` command on a native Linux
+filesystem. You will end up having a backup with wrong file ownership and/or
+permissions otherwise.
 
 # Example Usage
 
-	# REQUIRED: select a session type (default: direct)
-	make set-[direct, proxy, local]-session
+    # First, you should prepare your target in order to `make ssh` and `make sync-root`
+    # without password:
+    ./dcs-tools/make-target-settings
 
-	# REQUIRED: Run when switching to a session type for the first time
-	make init
+	# REQUIRED: setup a session type
+	make use-[direct, proxy]-session
 
 	# OPTIONS: you have several action options:
 	make mount-root         # mounts the root folder to NODE_ROOT
 	make umount-root        # unmount the root folder from NODE_ROOT
 	make ssh                # makes ssh
-	make backup-root        # backups whole root partition
+	make sync-root          # sync whole root partition of target
 
 # Tips
 
@@ -95,11 +69,14 @@ Whenever you need to update tools, run update:
 
 If you want to make it self-update on next run, remove the flag file:
 
-	rm project-directory/project-tools/no-need-to-update-flag
+	rm project-directory/up-to-date
 
 If you want to run a remote command, simply pass via ARGS= parameter
 
 	make ssh ARGS='uname -a'
+    # or
+    ./dcs-tools/ssh-proxy uname -a
+    ./dcs-tools/ssh-direct uname -a
 
 To create a Local port forward:
 
@@ -126,7 +103,7 @@ You can **force** all toolboxes update themselves **on next run** by issuing the
 
 ```
 cd remote-machines
-find . -maxdepth 3 -name "no-need-to-update*" -exec rm {} \;
+find . -maxdepth 2 -name "up-to-date" -exec rm {} \;
 ```
 
 You can **force** all toolboxes update **immediately**:
