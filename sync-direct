@@ -4,4 +4,4 @@ safe_source () { source $1; set_dir; }
 set_dir
 
 safe_source $DIR/common.sh
-$DIR/backup-over-ssh.sh --source $NODE_USER@$NODE_IP:$NODE_PORT/ --backup $DIR/../sync-root
+$DIR/sync-over-ssh --source $NODE_USER@$NODE_IP:$NODE_PORT/ --sync-dir $DIR/../sync-root

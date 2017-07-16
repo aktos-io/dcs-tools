@@ -6,4 +6,4 @@ set_dir
 safe_source $DIR/common.sh
 $DIR/create-tunnel
 
-$DIR/backup-over-ssh.sh --source $NODE_USER@localhost:$NODE_RENDEZVOUS_PORT/ --backup $DIR/../sync-root
+$DIR/sync-over-ssh --source $NODE_USER@localhost:$NODE_RENDEZVOUS_PORT/ --sync-dir $DIR/../sync-root
