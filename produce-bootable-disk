@@ -13,9 +13,8 @@
 # exit on error
 set -e
 
-set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }; set_dir
 safe_source () { source $1; set_dir; }
-set_dir
 
 if [[ $(id -u) > 0 ]]; then sudo $0 "$@"; exit; fi
 
@@ -198,6 +197,10 @@ rsync  -aHAXh "${backup}/boot/" ${BOOT_MNT}
 rsync  -aHAXh --exclude "boot" "${backup}/" ${ROOT_MNT}
 mkdir -p "${ROOT_MNT}/boot"
 
+echo "Setting /etc/resolv.conf attributes to make it immutable"
+chattr +i $ROOT_MNT/etc/resolv.conf
+
+
 echo "Syncing..."
 sync
 
@@ -213,6 +216,5 @@ echo_yellow "Do not forget to check the following files on target: "
 echo_yellow " * /boot/cmdline.txt"
 echo_yellow " * /etc/fstab"
 echo_yellow " * /etc/network/interfaces"
-echo_yellow " * attributes of /etc/resolv.conf"
 
 echo_green "Done..."
