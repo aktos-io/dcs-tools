@@ -15,8 +15,7 @@ UP_TO_DATE := up-to-date
 .check-update-needs:
 	@if [[ ! -f $(UP_TO_DATE) ]]; then \
 		echo "!!! No $(UP_TO_DATE) flag found"; \
-		$(TOOLS_DIR)/update.sh; \
-		touch $(UP_TO_DATE); \
+		make -s update; \
 	fi
 
 .check-session: .check-update-needs
@@ -52,7 +51,7 @@ mount-root: .check-session
 	fi
 
 umount-root:
-	$(TOOLS_DIR)/umount-node-root
+	@$(TOOLS_DIR)/umount-node-root
 
 sync-root: .check-session
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
@@ -62,4 +61,5 @@ sync-root: .check-session
 	fi
 
 update:
-	$(TOOLS_DIR)/update.sh
+	@$(TOOLS_DIR)/update.sh
+	touch $(UP_TO_DATE)
