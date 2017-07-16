@@ -14,7 +14,6 @@ safe_source $DIR/aktos-bash-lib/ssh-functions.sh
 [ $NODE_IP ] || die "Node IP is required!"
 [ $NODE_PORT ] || NODE_PORT=22
 
-echo_green "Target: $NODE_USER@$NODE_IP:$NODE_PORT"
 if [ $RENDEZVOUS_HOST ]; then
     [ $RENDEZVOUS_USER ] || die "Rendezvous username is required"
     [ $RENDEZVOUS_PORT ] || RENDEZVOUS_PORT=443
