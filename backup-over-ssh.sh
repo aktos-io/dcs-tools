@@ -14,11 +14,8 @@ set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
 safe_source () { source $1; set_dir; }
 set_dir
 
-if [[ $(id -u) > 0 ]]; then
-    #echo "This script needs root privileges..."
-    sudo $0 "$@"
-    exit
-fi
+if [[ $(id -u) > 0 ]]; then sudo $0 "$@"; exit; fi
+
 
 safe_source $DIR/aktos-bash-lib/basic-functions.sh
 safe_source $DIR/aktos-bash-lib/fs-functions.sh
