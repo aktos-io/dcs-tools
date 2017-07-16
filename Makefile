@@ -21,11 +21,11 @@ PROXY_SESSION := using-proxy-connection
 	@rm $(DIRECT_SESSION) 2> /dev/null; true
 	@rm $(PROXY_SESSION) 2> /dev/null; true
 
-set-direct-session: .clean-session
+use-direct-session: .clean-session
 	@echo "creating direct session..."
 	touch $(DIRECT_SESSION)
 
-set-proxy-session: .clean-session
+use-proxy-session: .clean-session
 	@echo "creating proxy session..."
 	touch $(PROXY_SESSION)
 
@@ -36,15 +36,19 @@ ssh: .check-session
 		$(TOOLS_DIR)/ssh-proxy; \
 	fi
 
-
-mount-root:
-	$(TOOLS_DIR)/proxy-mount
-
-backup-root:
-	$(TOOLS_DIR)/proxy-backup
-
-sync-root:
-	$(TOOLS_DIR)/proxy-backup
+mount-root: .check-session
+	@if [[ -f $(DIRECT_SESSION) ]]; then \
+		$(TOOLS_DIR)/mount-direct; \
+	elif [[ -f $(PROXY_SESSION) ]]; then \
+		$(TOOLS_DIR)/mount-proxy; \
+	fi
 
 umount-root:
 	$(TOOLS_DIR)/umount-node-root
+
+sync-root: .check-session
+	@if [[ -f $(DIRECT_SESSION) ]]; then \
+		$(TOOLS_DIR)/sync-direct; \
+	elif [[ -f $(PROXY_SESSION) ]]; then \
+		$(TOOLS_DIR)/sync-proxy; \
+	fi
