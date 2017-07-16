@@ -89,12 +89,14 @@ comment="no-comment"
 backup_name="$prefix-$comment"
 tmp_name="work-in-progress-$backup_name"
 
-
 start_timer
 if [[ "$method" == "hardlinks" ]]; then
+    if ls $backup_dir/work-in-progress* 1> /dev/null 2>&1; then
+        echo_err "work in progress directories found. Remove them first."
+    fi
     echo "Creating backup with the following name: $backup_name"
     echo "Using hardlinks method"
-    die "FIXME: invalid cross-device link error on btrfs filesystem. Below code is still tested well."
+    echo_err "FIXME: invalid cross-device link error on btrfs filesystem. Below code is still tested well."
     cp -al $source_dir $backup_dir/$tmp_name
     mv $backup_dir/$tmp_name $backup_dir/$backup_name
 elif [[ "$method" == "btrfs" ]]; then
