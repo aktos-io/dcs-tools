@@ -16,5 +16,8 @@ mount-root:
 backup-root:
 	$(TOOLS_DIR)/proxy-backup
 
+sync-root:
+	$(TOOLS_DIR)/proxy-backup
+
 umount-root:
 	$(TOOLS_DIR)/umount-node-root
