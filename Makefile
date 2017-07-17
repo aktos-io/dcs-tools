@@ -63,3 +63,6 @@ sync-root: .check-session
 update:
 	@$(TOOLS_DIR)/update.sh
 	touch $(UP_TO_DATE)
+
+configure:
+	@nano $(TOOLS_DIR)/config.sh
