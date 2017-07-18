@@ -11,7 +11,7 @@ NODE_IP="xx.yy.zz.tt"
 # ------------------------------------
 # create master socket first: 
 #
-#     ssh you@example.com -p 1234 -M -S /path/to/ssh-master-you@example.com:1234.socket
+#     ssh -M -S /path/to/your-socket-file you@example.com -p 1234
 #
-SSH_SOCKET_FILE="/path/to/ssh-master-you@example.com:1234.socket"
+SSH_SOCKET_FILE="/path/to/your-socket-file"
 NODE_RENDEZVOUS_PORT=7000
