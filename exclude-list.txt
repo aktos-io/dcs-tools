@@ -30,3 +30,5 @@
 *--no-sync
 /.*                                       # hidden files under root, eg. snapper snapshot dir
 /var/lib/lxcfs
+
+**/.npm/_cacache
