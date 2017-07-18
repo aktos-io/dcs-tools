@@ -1,4 +1,4 @@
-# Direct (on LAN) connection settings:
+# Direct connection settings:
 # ------------------------------------
 NODE_IP="xx.yy.zz.tt"
 #NODE_PORT=22
