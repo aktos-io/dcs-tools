@@ -28,11 +28,11 @@ UP_TO_DATE := up-to-date
 	@rm $(DIRECT_SESSION) 2> /dev/null; true
 	@rm $(PROXY_SESSION) 2> /dev/null; true
 
-use-direct-session: .clean-session
+direct-connection: .clean-session
 	@echo "creating direct session..."
 	touch $(DIRECT_SESSION)
 
-use-proxy-session: .clean-session
+proxy-connection: .clean-session
 	@echo "creating proxy session..."
 	touch $(PROXY_SESSION)
 
