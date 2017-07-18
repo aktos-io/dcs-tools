@@ -84,10 +84,14 @@ done
 [[ -d $backup_dir ]] || die "backups should be a directory."
 [[ -d $source_dir ]] || die "source should be a directory."
 
+read -p "Enter Comment : " comment
+[[ $comment ]] || echo_err "Comment is required."
+comment=$(echo $comment | sed -e 's/ /-/g')
+
 prefix=$(get_timestamp)
-comment="no-comment"
 backup_name="$prefix-$comment"
 tmp_name="work-in-progress-$backup_name"
+
 
 start_timer
 if [[ "$method" == "hardlinks" ]]; then
