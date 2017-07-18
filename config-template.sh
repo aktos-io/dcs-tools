@@ -1,8 +1,8 @@
 # Direct connection settings:
 # ------------------------------------
 NODE_IP="xx.yy.zz.tt"
-#NODE_PORT=22
 #NODE_USER="aea"
+#NODE_PORT=22
 #KEY_FILE="$HOME/.ssh/id_rsa"
 #MOUNT_DIR=$(mktemp -d)
 
