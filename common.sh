@@ -10,7 +10,6 @@ safe_source $DIR/aktos-bash-lib/ssh-functions.sh
 [ $NODE_USER ] || NODE_USER="aea"
 [ $KEY_FILE ] || KEY_FILE="$HOME/.ssh/id_rsa"
 [ $MOUNT_DIR ] || MOUNT_DIR=$(mktemp -d)
-[ $NODE_IP ] || die "Node IP is required!"
 [ $NODE_PORT ] || NODE_PORT=22
 
 if [ $RENDEZVOUS_HOST ]; then
