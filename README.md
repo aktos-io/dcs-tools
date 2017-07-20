@@ -34,9 +34,11 @@ Backups have following properties:
 
 Follow these steps for a quick startup:
 
-	cd project-directory
+	cd your-project
 	git clone https://github.com/aktos-io/dcs-tools
-	./dcs-tools/setup
+	cd dcs-tools 
+	git submodule update --init --recursive 
+	./setup 
 
 # BIG WARNING
 
@@ -52,7 +54,9 @@ permissions otherwise.
 
 2. Daily usage: 
 
-  	    # REQUIRED: setup a session type
+	    cd your-project
+	    
+  	    # REQUIRED: setup a connection type 
 	    make [direct, proxy]-connection
 
   	    # OPTIONS: you have several action options:
