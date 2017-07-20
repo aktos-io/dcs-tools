@@ -1,6 +1,6 @@
 # Direct connection settings:
 # ------------------------------------
-NODE_IP="xx.yy.zz.tt"
+#NODE_IP="xx.yy.zz.tt" # Required for direct connections
 #NODE_USER="aea"
 #NODE_PORT=22
 #KEY_FILE="$HOME/.ssh/id_rsa"
@@ -14,4 +14,4 @@ NODE_IP="xx.yy.zz.tt"
 #     ssh -M -S /path/to/your-socket-file you@example.com -p 1234
 #
 SSH_SOCKET_FILE="/path/to/your-socket-file"
-NODE_RENDEZVOUS_PORT=7000
+NODE_RENDEZVOUS_PORT=1234
