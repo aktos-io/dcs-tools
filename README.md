@@ -85,34 +85,12 @@ If you want to run a remote command, simply pass via ARGS= parameter
 To create a Local port forward:
 
 	make ssh ARGS='-L 1234:localhost:5678'
+	
+# See Also 
 
-# Advanced Tips
+[Tips and tricks](./doc/tips-and-tricks.md)
 
-If you keep your directory layout like:
+# Complementary Libraries 
 
-+ remote-machines
-  + machine-1
-    + project-tools
-    + Makefile
-    + snapshots
-    + ...
-  + machine-2
-    + aktos-dcs-tools (or whatever you named it)
-    + Makefile
-    + snapshots
-    + ...
-  + ...
+* [link-with-server](https://github.com/aktos-io/link-with-server/) : Reliably put target node's SSH port into server, make `make ssh` and `make mount-root` commands lightning-fast. 
 
-You can **force** all toolboxes update themselves **on next run** by issuing the following command:
-
-```
-cd remote-machines
-find . -maxdepth 2 -name "up-to-date" -exec rm {} \;
-```
-
-You can **force** all toolboxes update **immediately**:
-
-```
-cd remote-machines
-find . -type d -maxdepth 1 -exec sh -c '(echo {}; cd {} && make update)' ';'
-```
