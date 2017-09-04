@@ -6,7 +6,7 @@ This toolset is intended to use with remote Linux devices (embedded or not). You
 * `make ssh ARGS='-L 8080:localhost:1234'` # port forward or remote code execution
 * `make mount-root` of target pc
 * `make sync-root` of target pc
-* `produce-bootable-disk` from any backup folder
+* `./produce-bootable-disk` from any backup folder
 
 # Connection types
 
