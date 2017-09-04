@@ -1,4 +1,4 @@
-# Options
+# Description / Options
 
 This toolset is intended to use with remote Linux devices (embedded or not). You can easily:
 
