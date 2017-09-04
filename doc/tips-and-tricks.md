@@ -1,3 +1,25 @@
+# Tips
+
+Whenever you need to update tools, run update:
+
+	make update
+
+If you want to make it self-update on next run, remove the flag file:
+
+	rm project-directory/up-to-date
+
+If you want to run a remote command, simply pass via ARGS= parameter
+
+    make ssh ARGS='uname -a'
+    # or
+    ./dcs-tools/ssh-proxy uname -a
+    ./dcs-tools/ssh-direct uname -a
+
+To create a Local port forward:
+
+	make ssh ARGS='-L 1234:localhost:5678'
+
+
 # Advanced Tips
 
 If you keep your directory layout like:
