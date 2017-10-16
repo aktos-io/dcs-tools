@@ -32,3 +32,4 @@
 /var/lib/lxcfs
 
 **/.npm/_cacache
+/var/lib/mlocate/mlocate.db*
