@@ -42,15 +42,35 @@ permissions otherwise.
 
 # Install
 
-Follow these steps for a quick startup:
+### Requirements 
 
+* Linux OS
+* `git` (for submodule fetching and `make update`)
+* `rsync`
+
+### Setup 
+
+Follow these steps for every project:
+
+	# on your host (eg. your laptop)
+	mkdir your-project
 	cd your-project
 	git clone https://github.com/aktos-io/dcs-tools
 	cd dcs-tools 
 	git submodule update --init --recursive 
 	./setup 
 
-# Example Usage
+### Configuration 
+
+Terminology: 
+
+* `NODE_*` or `target`: the target Linux system you want to manage from your host. 
+* `KEY_FILE`: the SSH key file you will use for passwordless login
+* `SSH_SOCKET_FILE`: the socket file for re-using an existing ssh connection (to greatly improve the performance)
+* *RENDEZVOUS SERVER*: An intermediate server that will serve as a rendezvous point with you and your target. (see ./doc/proxy-connection.md)
+
+
+### Usage
 
 1. First, you should prepare your target in order to `make ssh` and `make sync-root` without password:
 	    
