@@ -19,20 +19,20 @@ Make the following settings if you want to `make proxy-connection`s:
 
 1. Add the following options to your configuration file:
 
-    SSH_SOCKET_FILE="/path/to/your-socket-file"
-    NODE_RENDEZVOUS_PORT=1234
+        SSH_SOCKET_FILE="/path/to/your-socket-file"
+        NODE_RENDEZVOUS_PORT=1234
 
 
 2. You are responsible for creating an SSH connection beforehand to your Rendezvous server with a Master Socket File option: 
 
-    ssh -M -S /path/to/your-socket-file you@example.com -p 1234
+        ssh -M -S /path/to/your-socket-file you@example.com -p 1234
     
- > Tip: use https://github.com/aktos-io/link-with-server/ to let it make the connection for you.
+ > Tip: use https://github.com/aktos-io/link-with-server/ to create this connection automatically on every boot.
 
 
 3. Then change the connection method once: 
 
-    make proxy-connection     
+        make proxy-connection     
     
     
 You will be able to use rest of your daily usage commands as if you are connecting directly: 
