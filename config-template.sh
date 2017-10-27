@@ -1,17 +1,7 @@
 # Direct connection settings:
 # ------------------------------------
-#NODE_IP="xx.yy.zz.tt" # Required for direct connections
-#NODE_USER="aea"
-#NODE_PORT=22
-#KEY_FILE="$HOME/.ssh/id_rsa"
-
-# Proxy connection settings
-# ------------------------------------
-# create master socket first: 
-#
-#     ssh -M -S /path/to/your-socket-file you@example.com -p 1234
-#
-SSH_SOCKET_FILE="/path/to/your-socket-file"
-NODE_RENDEZVOUS_PORT=1234
+NODE_IP="xx.yy.zz.tt" # Required for direct connections
+NODE_USER="aea"
+NODE_PORT=22
 
 # See doc/configuration.md for additional configuration options
