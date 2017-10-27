@@ -88,8 +88,3 @@ permissions otherwise.
 # See Also 
 
 [Tips and tricks](./doc/tips-and-tricks.md)
-
-# Complementary Libraries 
-
-* [link-with-server](https://github.com/aktos-io/link-with-server/) : Reliably put target node's SSH port into server, make `make ssh` and `make mount-root` commands lightning-fast. 
-
