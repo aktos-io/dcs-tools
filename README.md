@@ -1,6 +1,6 @@
 # Description
 
-This toolset is intended to manage remote Linux devices (embedded or not) from host Linux systems. 
+This toolset is intended to use for managing remote Linux devices (embedded or not) from host Linux systems. 
 
 # Install
 
@@ -40,29 +40,34 @@ Terminology:
 
 2. Daily usage: 
 
-	    cd your-project
+```bash
+cd your-project
+```
 	    
-  	    # REQUIRED: setup a connection type 
-	    make direct-connection 
-	    #make proxy-connection
+REQUIRED: setup a connection type for the first time
 
-  	    # OPTIONS: you have several action options:
-	    make mount-root         # mounts the root folder to NODE_ROOT
-	    make umount-root        # unmount the root folder from NODE_ROOT
-	    make ssh                # makes ssh
-	    make sync-root          # sync whole root partition of target
+```bash
+make direct-connection  # connect to remote target directly (LAN, Internet, directly via cable)
+# or 
+make proxy-connection   # connect to remote target via a rendezvous server
+```
 
+Options/actions: 
 
+```bash
+make ssh                # makes ssh
+make mount-root         # mounts the root folder to NODE_ROOT
+make umount-root        # unmount the root folder from NODE_ROOT
+make sync-root          # sync whole root partition of target
+```
 
-# Options 
+Advanced actions:
 
-You can:
-
-* `make ssh`
-* `make ssh ARGS='-L 8080:localhost:1234'` # port forward or remote code execution
-* `make mount-root` of target pc/device
-* `make sync-root` of target pc/device
-* `./produce-bootable-disk` from any backup folder
+```bash
+./dcs-tools/make-backup              # from synchronized folder
+./dcs-tools/produce-bootable-disk    # from any backup folder
+./dcs-tools/restore-from-backup      # restores all files from backup folder to SD card
+```
 
 ### Connection types
 
