@@ -4,8 +4,6 @@
 #NODE_USER="aea"
 #NODE_PORT=22
 #KEY_FILE="$HOME/.ssh/id_rsa"
-#MOUNT_DIR=$(mktemp -d)
-
 
 # Proxy connection settings
 # ------------------------------------
@@ -15,3 +13,5 @@
 #
 SSH_SOCKET_FILE="/path/to/your-socket-file"
 NODE_RENDEZVOUS_PORT=1234
+
+# See doc/configuration.md for additional configuration options
