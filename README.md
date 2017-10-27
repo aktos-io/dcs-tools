@@ -67,7 +67,7 @@ Terminology:
 * `NODE_*` or `target`: the target Linux system you want to manage from your host. 
 * `KEY_FILE`: the SSH key file you will use for passwordless login
 * `SSH_SOCKET_FILE`: the socket file for re-using an existing ssh connection (to greatly improve the performance)
-* *RENDEZVOUS SERVER*: An intermediate server that will serve as a rendezvous point with you and your target. (see ./doc/proxy-connection.md)
+* *RENDEZVOUS SERVER*: An intermediate server that will serve as a rendezvous point with you and your target. (see [doc/proxy-connection.md](./doc/proxy-connection.md))
 
 
 ### Usage
