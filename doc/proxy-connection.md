@@ -1,4 +1,6 @@
-Proxy connection is a connection type that hides some details from you between you and your target (Raspberry, in this case).
+# Proxy Connection 
+
+Proxy connection is a connection type that hides some details from you between you and your target (Raspberry, for example).
 
 Normally you have to know target device's IP address in order to be able to connect to it. If your target is another location, you have to make some port forwardings in the target network's modem/firewall. You also have to assign static IP address to your target.
 
