@@ -1,9 +1,14 @@
 # Configuration 
 
-Terminology: 
+> Terminology: `NODE` or the *target* is the target Linux system you want to connect/manage from your host. 
 
-* `NODE_*` or *target*: the target Linux system you want to manage from your host. 
-* *RENDEZVOUS SERVER*: 
+## Direct Connection 
+
+Used for direct connections that you would make if your target is on your LAN, on a outside network that you know its public IP, or connected with a direct LAN cable:
+
+    NODE_IP="xx.yy.zz.tt"
+    NODE_USER="aea"
+    NODE_PORT=22
 
 
 ## Proxy Connection
