@@ -24,57 +24,41 @@ Follow these steps for every project:
 
 ### Configuration 
 
-Terminology: 
+Simplest configuration, assuming your target has the IP of `192.168.1.6`: 
 
-* `NODE_*` or *target*: the target Linux system you want to manage from your host. 
-* `KEY_FILE`: the SSH key file you will use for passwordless login
-* `SSH_SOCKET_FILE`: the socket file for re-using an existing ssh connection (to greatly improve the performance)
-* *RENDEZVOUS SERVER*: An intermediate server that will serve as a rendezvous point with you and your target. (see [doc/proxy-connection.md](./doc/proxy-connection.md))
+	NODE_IP="192.168.1.6" 
+	NODE_USER="aea"
+	NODE_PORT=22
 
+For other options, see [configuration.md](./doc/configuration.md).
 
 ### Usage
 
-1. First, you should prepare your target in order to `make ssh` and `make sync-root` without password:
-	    
-        ./dcs-tools/make-target-settings
+First, you should prepare your target and setup your preferences:
 
-2. Daily usage: 
-
-```bash
-cd your-project
-```
-	    
-REQUIRED: setup a connection type for the first time
-
-```bash
-make direct-connection  # connect to remote target directly (LAN, Internet, directly via cable)
-# or 
-make proxy-connection   # connect to remote target via a rendezvous server
-```
-
+	# assuming you are already in /path/to/your-project 
+	./dcs-tools/make-target-settings  # optional, a password will be asked on every connection otherwise.
+    
+    # Setup the connection type for the first time 
+	make direct-connection  # connect to remote target when you know its IP address and port
+	# or meet with your target on a known server:
+	make proxy-connection   # see doc/configuration.md
+	
 Options/actions: 
 
 ```bash
 make ssh                # makes ssh
-make mount-root         # mounts the root folder to NODE_ROOT
-make umount-root        # unmount the root folder from NODE_ROOT
-make sync-root          # sync whole root partition of target
+make mount-root         # mounts the root folder to `your-project/NODE_ROOT`, later unmount with `make umount-root`
+make sync-root          # sync whole root partition of target with `your-project/sync-root` folder
 ```
 
 Advanced actions:
 
 ```bash
-./dcs-tools/make-backup              # from synchronized folder
-./dcs-tools/produce-bootable-disk    # from any backup folder
+./dcs-tools/make-backup              # make a backup from synchronized folder
+./dcs-tools/produce-bootable-disk    # produce a bootable disk from any backup folder
 ./dcs-tools/restore-from-backup      # restores all files from backup folder to SD card
 ```
-
-### Connection types
-
-There are 2 connection modes available:
-
-* `make direct-connection` : connected to remote target directly (LAN, Internet, directly via cable)
-* `make proxy-connection`  : connected to remote target via a rendezvous server
 
 # Advantages
 Backups have following properties:
