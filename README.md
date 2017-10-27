@@ -1,6 +1,6 @@
 # Description
 
-This toolset is intended to use with remote Linux devices (embedded or not) from host Linux systems. 
+This toolset is intended to manage remote Linux devices (embedded or not) from host Linux systems. 
 
 # Install
 
