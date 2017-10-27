@@ -1,6 +1,14 @@
 # Configuration 
 
+Terminology: 
+
+* `NODE_*` or *target*: the target Linux system you want to manage from your host. 
+* *RENDEZVOUS SERVER*: An intermediate server that will serve as a rendezvous point with you and your target. (see [proxy-connection.md](./proxy-connection.md))
+
+
 ## Custom ssh_key
+
+The SSH key file you will use for passwordless login
 
 ```bash
 KEY_FILE="/path/to/your/id_rsa"
