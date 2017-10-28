@@ -1,6 +1,9 @@
 # Configuration 
 
-> Terminology: `NODE` or the *target* is the target Linux system you want to connect/manage from your host. 
+Terminology: 
+
+*`NODE` or the *target* is the target Linux system you want to connect/manage from your host. 
+* Host: The computer you use to manage your NODE's, eg. your laptop.
 
 ## Direct Connection 
 
@@ -27,7 +30,7 @@ Make the following settings if you want to `make proxy-connection`s:
 
         ssh -M -S /path/to/your-socket-file you@example.com -p 1234
     
- > Tip: use https://github.com/aktos-io/link-with-server/ to create this connection automatically on every boot.
+ > Tip: use https://github.com/aktos-io/link-with-server/ on your host to create this connection automatically on every boot.
 
 
 3. Then change the connection method once: 
