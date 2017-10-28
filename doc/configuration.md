@@ -2,7 +2,7 @@
 
 Terminology: 
 
-*`NODE` or the *target* is the target Linux system you want to connect/manage from your host. 
+* `NODE` or the *target* is the target Linux system you want to connect/manage from your host. 
 * Host: The computer you use to manage your NODE's, eg. your laptop.
 
 ## Direct Connection 
