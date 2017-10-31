@@ -17,10 +17,8 @@ Follow these steps for every project:
 	# on your host (eg. your laptop)
 	mkdir your-project
 	cd your-project
-	git clone https://github.com/aktos-io/dcs-tools
-	cd dcs-tools 
-	git submodule update --init --recursive 
-	./setup 
+	git clone https://github.com/aktos-io/dcs-tools --recursive
+	./dcs-tools/setup 
 
 ### Configuration 
 
