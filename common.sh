@@ -29,8 +29,7 @@ sed 's/^[^ ]* /\* /' $known_hosts_file > "${known_hosts_file}.bak111" && mv "${k
 
 custom_known_hosts="-o UserKnownHostsFile=$known_hosts_file \
     -o StrictHostKeyChecking=ask \
-    -o HashKnownHosts=no \
     -o CheckHostIP=no "
 
-SSH="$SSH $custom_known_hosts"
+SSH="$SSH $custom_known_hosts -o HashKnownHosts=no "
 SSHFS="$SSHFS $custom_known_hosts"
