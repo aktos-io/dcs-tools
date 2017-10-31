@@ -23,7 +23,14 @@ NODE_MOUNT_LINK="$DIR/../NODE_ROOT"
 
 known_hosts_file=$(realpath $DIR/../known_hosts)
 touch $known_hosts_file
-custom_known_hosts="-o UserKnownHostsFile=$known_hosts_file"
+
+# match with all hosts
+sed 's/^[^ ]* /\* /' $known_hosts_file > "${known_hosts_file}.bak111" && mv "${known_hosts_file}.bak111" $known_hosts_file
+
+custom_known_hosts="-o UserKnownHostsFile=$known_hosts_file \
+    -o StrictHostKeyChecking=ask \
+    -o HashKnownHosts=no \
+    -o CheckHostIP=no "
 
 SSH="$SSH $custom_known_hosts"
 SSHFS="$SSHFS $custom_known_hosts"
