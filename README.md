@@ -48,15 +48,15 @@ First, you should prepare your target and setup your preferences:
 
 2. Setup the connection type for the first time:
 
-2.1. *Either:* connect to remote target its IP address and port:
-	
-	make direct-connection  
-	
-2.2. *Or:* meet with your target on a known server:
-	
-	make proxy-connection   
+	2.1. *Either:* connect to remote target its IP address and port:
 
-See [doc/configuration.md](./doc/configuration.md) for explanations.
+		make direct-connection  
+
+	2.2. *Or:* meet with your target on a known server:
+
+		make proxy-connection   
+
+	See [doc/configuration.md](./doc/configuration.md) for explanations.
 
 ##### Options/actions: 
 
