@@ -5,6 +5,8 @@ Terminology:
 * `NODE` or the *target* is the target Linux system you want to connect/manage from your host. 
 * Host: The computer you use to manage your NODE's, eg. your laptop.
 
+Since the `config.sh` is sourced, you can use any `bash` commands to generate the variables.
+
 ## Direct Connection 
 
 Used for direct connections that you would make if your target is on your LAN, on a outside network that you know its public IP, or connected with a direct LAN cable:

@@ -1,6 +1,12 @@
 # Description
 
-This toolset is intended to use for managing remote Linux devices (embedded or not) from host Linux systems. 
+This toolset is intended to use for managing remote Linux devices (RaspberryPi in mind, but any remote Linux system will work) from host Linux systems, by basically simplifying 5 tasks: 
+
+1. You use `ssh` for performing remote tasks. 
+2. You use `sshfs` for simple drag and drop style file transfers. 
+3. You use `rsync` for backing up of target's entire root filesystem. 
+4. You create incremental backups. 
+5. You create bootable system disks from any of your backups locally.
 
 # Install
 
@@ -34,15 +40,25 @@ For other options, see [configuration.md](./doc/configuration.md).
 
 First, you should prepare your target and setup your preferences:
 
-	# assuming you are already in /path/to/your-project 
-	./dcs-tools/make-target-settings  # optional, a password will be asked on every connection otherwise.
-    
-    # Setup the connection type for the first time 
-	make direct-connection  # connect to remote target when you know its IP address and port
-	# or meet with your target on a known server:
-	make proxy-connection   # see doc/configuration.md
+	cd /path/to/your-project 
 	
-Options/actions: 
+1. Optional: a password will be asked on every connection otherwise.
+	
+	   ./dcs-tools/make-target-settings  
+
+2. Setup the connection type for the first time:
+
+	2.1. *Either:* connect to remote target its IP address and port:
+
+		make direct-connection  
+
+	2.2. *Or:* meet with your target on a known server:
+
+		make proxy-connection   
+
+	See [doc/configuration.md](./doc/configuration.md) for explanations.
+
+##### Options/actions: 
 
 ```bash
 make ssh                # makes ssh
@@ -50,7 +66,7 @@ make mount-root         # mounts the root folder to `your-project/NODE_ROOT`, la
 make sync-root          # sync whole root partition of target with `your-project/sync-root` folder
 ```
 
-Advanced actions:
+##### Advanced actions:
 
 ```bash
 ./dcs-tools/make-backup              # make a backup from synchronized folder
