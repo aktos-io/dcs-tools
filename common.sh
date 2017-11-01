@@ -2,16 +2,22 @@
 set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }; set_dir
 safe_source () { source $1; set_dir; }
 
-
-safe_source $DIR/config.sh
 safe_source $DIR/aktos-bash-lib/basic-functions.sh
 safe_source $DIR/aktos-bash-lib/ssh-functions.sh
 
+if [[ -f $DIR/config.sh ]]; then
+    echo_yellow "DEPRECATION:"
+    echo_yellow "Configuration file (config.sh) should be in project directory"
+    mv $DIR/config.sh $DIR/../config.sh
+fi
+
+safe_source $DIR/../config.sh
+
+# set the default configuration
 [ $NODE_USER ] || NODE_USER="aea"
 [ $KEY_FILE ] || KEY_FILE="$HOME/.ssh/id_rsa"
 [ $MOUNT_DIR ] || MOUNT_DIR=$(mktemp -d)
 [ $NODE_PORT ] || NODE_PORT=22
-
 if [ $RENDEZVOUS_HOST ]; then
     [ $RENDEZVOUS_USER ] || die "Rendezvous username is required"
     [ $RENDEZVOUS_PORT ] || RENDEZVOUS_PORT=443

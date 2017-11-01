@@ -1,11 +1,12 @@
 #!/bin/bash
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+CONFIG="$DIR/../config.sh"
 
 ln -sf "./$(basename $DIR)/Makefile" "$DIR/../Makefile"
 
-if [[ ! -e "$DIR/config.sh" ]]; then
-  cp "$DIR/config-template.sh" "$DIR/config.sh"
-  nano "$DIR/config.sh"
+if [[ ! -e "$CONFIG" ]]; then
+  cp "$DIR/config-template.sh" "$CONFIG"
+  nano "$CONFIG"
 else
   echo "There is a configuration file already"
 fi
