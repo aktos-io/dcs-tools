@@ -5,13 +5,20 @@ safe_source () { source $1; set_dir; }
 safe_source $DIR/aktos-bash-lib/basic-functions.sh
 safe_source $DIR/aktos-bash-lib/ssh-functions.sh
 
+CONFIG=$DIR/../config.sh
+
 if [[ -f $DIR/config.sh ]]; then
     echo_yellow "DEPRECATION:"
     echo_yellow "Configuration file (config.sh) should be in project directory"
-    mv $DIR/config.sh $DIR/../config.sh
+    mv $DIR/config.sh $CONFIG
 fi
 
-safe_source $DIR/../config.sh
+if [[ ! -f $CONFIG ]]; then
+    echo_yellow "You need to configure first"
+    exit
+fi
+
+safe_source $CONFIG
 
 # set the default configuration
 [ $NODE_USER ] || NODE_USER="aea"
