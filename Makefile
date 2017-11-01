@@ -65,4 +65,4 @@ update:
 	touch $(UP_TO_DATE)
 
 configure:
-	@nano $(TOOLS_DIR)/config.sh
+	@nano $(PROJECT_ROOT)/config.sh
