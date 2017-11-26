@@ -23,7 +23,7 @@ Follow these steps for every project:
 	# on your host (eg. your laptop)
 	mkdir your-project
 	cd your-project
-	git clone https://github.com/aktos-io/dcs-tools --recursive
+	git clone --recursive https://github.com/aktos-io/dcs-tools
 	./dcs-tools/setup
 
 ### Configuration
@@ -38,15 +38,17 @@ For other options, see [configuration.md](./doc/configuration.md).
 
 ### Usage
 
+##### Preperation 
+
 First, you should prepare your target and setup your preferences:
 
 	cd /path/to/your-project
 
-1. Optional: a password will be asked on every connection otherwise.
+1. Send your RSA public key to the target in order to prevent asking password on every connection (optional):
 
 	   ./dcs-tools/make-target-settings  
 
-2. Setup the connection type for the first time:
+2. Setup the connection type:
 
 	2.1. *Either:* connect to remote target its IP address and port:
 
@@ -64,12 +66,14 @@ First, you should prepare your target and setup your preferences:
 make ssh                # makes ssh
 make mount-root         # mounts the root folder to `your-project/NODE_ROOT`, later unmount with `make umount-root`
 make sync-root          # sync whole root partition of target with `your-project/sync-root` folder
+make backup-sync        # make a backup from the sync-root folder
 ```
 
 ##### Advanced actions:
 
+These tools are for advanced usage, use them with caution:
+
 ```bash
-make backup-sync                     # make a backup from sync-root folder
 ./dcs-tools/produce-bootable-disk    # produce a bootable disk from any backup folder
 ./dcs-tools/restore-from-backup      # restores all files from backup folder to SD card
 ```
