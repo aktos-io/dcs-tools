@@ -1,22 +1,22 @@
 # Description
 
-This toolset is intended to use for managing remote Linux devices (RaspberryPi in mind, but any remote Linux system will work) from host Linux systems, by basically simplifying 5 tasks: 
+This toolset is intended to use for managing remote Linux devices (RaspberryPi in mind, but any remote Linux system will work) from host Linux systems, by basically simplifying 5 tasks:
 
-1. You use `ssh` for performing remote tasks. 
-2. You use `sshfs` for simple drag and drop style file transfers. 
-3. You use `rsync` for backing up of target's entire root filesystem. 
-4. You create incremental backups. 
+1. You use `ssh` for performing remote tasks.
+2. You use `sshfs` for simple drag and drop style file transfers.
+3. You use `rsync` for backing up of target's entire root filesystem.
+4. You create incremental backups.
 5. You create bootable system disks from any of your backups locally.
 
 # Install
 
-### Requirements 
+### Requirements
 
 * Linux OS
 * `git` (for submodule fetching and `make update`)
 * `rsync`
 
-### Setup 
+### Setup
 
 Follow these steps for every project:
 
@@ -24,13 +24,13 @@ Follow these steps for every project:
 	mkdir your-project
 	cd your-project
 	git clone https://github.com/aktos-io/dcs-tools --recursive
-	./dcs-tools/setup 
+	./dcs-tools/setup
 
-### Configuration 
+### Configuration
 
-Simplest configuration, assuming your target has the IP of `192.168.1.6`: 
+Simplest configuration, assuming your target has the IP of `192.168.1.6`:
 
-	NODE_IP="192.168.1.6" 
+	NODE_IP="192.168.1.6"
 	NODE_USER="aea"
 	NODE_PORT=22
 
@@ -40,10 +40,10 @@ For other options, see [configuration.md](./doc/configuration.md).
 
 First, you should prepare your target and setup your preferences:
 
-	cd /path/to/your-project 
-	
+	cd /path/to/your-project
+
 1. Optional: a password will be asked on every connection otherwise.
-	
+
 	   ./dcs-tools/make-target-settings  
 
 2. Setup the connection type for the first time:
@@ -58,7 +58,7 @@ First, you should prepare your target and setup your preferences:
 
 	See [doc/configuration.md](./doc/configuration.md) for explanations.
 
-##### Options/actions: 
+##### Options/actions:
 
 ```bash
 make ssh                # makes ssh
@@ -69,7 +69,7 @@ make sync-root          # sync whole root partition of target with `your-project
 ##### Advanced actions:
 
 ```bash
-./dcs-tools/make-backup              # make a backup from synchronized folder
+make backup-sync                     # make a backup from sync-root folder
 ./dcs-tools/produce-bootable-disk    # produce a bootable disk from any backup folder
 ./dcs-tools/restore-from-backup      # restores all files from backup folder to SD card
 ```
@@ -88,17 +88,17 @@ Backups have following properties:
 ### Move your backups around carefully
 
 If you are not using **btrfs**, "dead simple copies" feature will bite you in the following way:
- 
+
 Backups are just plain folders, which may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`**.
 
-If you are using `--method btrfs`, backups are made as readonly snapshots. 
+If you are using `--method btrfs`, backups are made as readonly snapshots.
 
 ### Use correct filesystem
 
 Make sure that you are performing `make sync-root` command on a native Linux
 filesystem. You will end up having a backup with wrong file ownership and/or
 permissions otherwise.
-	
-# See Also 
+
+# See Also
 
 [Tips and tricks](./doc/tips-and-tricks.md)
