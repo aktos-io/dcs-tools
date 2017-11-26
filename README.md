@@ -5,8 +5,8 @@ This toolset is intended to use for managing remote Linux devices (RaspberryPi i
 1. You use `ssh` for performing remote tasks.
 2. You use `sshfs` for simple drag and drop style file transfers.
 3. You use `rsync` for backing up of target's entire root filesystem.
-4. You create incremental backups.
-5. You create bootable system disks from any of your backups locally.
+4. You need to create incremental backups.
+5. You need to create bootable system disks from any of your backups locally.
 
 # Install
 
