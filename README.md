@@ -27,7 +27,7 @@ Follow these steps for every project:
 
 ### Configuration
 
-> Assuming you are in `/path/to/your-project` folder already
+Assuming you are in `/path/to/your-project` folder already, 
 
 1. Create your `config.sh` and mandatory folders/flags: 
 
