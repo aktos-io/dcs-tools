@@ -24,9 +24,14 @@ Follow these steps for every project:
 	mkdir your-project
 	cd your-project
 	git clone --recursive https://github.com/aktos-io/dcs-tools
-	./dcs-tools/setup
 
 ### Configuration
+
+> Assuming you are in `/path/to/your-project` folder already
+
+1. Create your `config.sh` and mandatory folders/flags: 
+
+	./dcs-tools/setup
 
 Simplest configuration, assuming your target has the IP of `192.168.1.6`:
 
@@ -34,33 +39,20 @@ Simplest configuration, assuming your target has the IP of `192.168.1.6`:
 	NODE_USER="aea"
 	NODE_PORT=22
 
-For other options, see [configuration.md](./doc/configuration.md).
-
-### Usage
-
-##### Preperation 
-
-First, you should prepare your target and setup your preferences:
-
-	cd /path/to/your-project
-
-1. Send your RSA public key to the target in order to prevent asking password on every connection (optional):
-
-	   ./dcs-tools/make-target-settings  
-
 2. Setup the connection type:
 
-	2.1. *Either:* connect to remote target its IP address and port:
+       make direct-connection     # connect to remote target its IP address and port
+                                  # or 
+       make proxy-connection      # meet with your target on a known server
 
-		make direct-connection  
 
-	2.2. *Or:* meet with your target on a known server:
+3. *(Optional)*: Send your RSA public key to the target in order to prevent asking password on every connection:
 
-		make proxy-connection   
+       ./dcs-tools/make-target-settings  
 
-	See [doc/configuration.md](./doc/configuration.md) for explanations.
+See [doc/configuration.md](./doc/configuration.md) for explanations.
 
-##### Options/actions:
+### Usage
 
 ```bash
 make ssh                # makes ssh
@@ -71,7 +63,7 @@ make backup-sync        # make a backup from the sync-root folder
 
 ##### Advanced actions:
 
-These tools are for advanced usage, use them with caution:
+Following tools are for advanced usage, use them with caution:
 
 ```bash
 ./dcs-tools/produce-bootable-disk    # produce a bootable disk from any backup folder
