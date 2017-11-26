@@ -100,7 +100,6 @@ if [[ "$method" == "hardlinks" ]]; then
     fi
     echo "Creating backup with the following name: $backup_name"
     echo "Using hardlinks method"
-    echo_err "FIXME: invalid cross-device link error on btrfs filesystem. Below code is still tested well."
     cp -al $source_dir $backup_dir/$tmp_name
     mv $backup_dir/$tmp_name $backup_dir/$backup_name
 elif [[ "$method" == "btrfs" ]]; then
