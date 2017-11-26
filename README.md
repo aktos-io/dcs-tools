@@ -31,18 +31,18 @@ Follow these steps for every project:
 
 1. Create your `config.sh` and mandatory folders/flags: 
 
-	./dcs-tools/setup
+       ./dcs-tools/setup
 
-Simplest configuration, assuming your target has the IP of `192.168.1.6`:
+> Simplest configuration, assuming your target has the IP of `192.168.1.6`:
+> 
+>     NODE_IP="192.168.1.6"
+>     NODE_USER="aea"
+>     NODE_PORT=22
 
-	NODE_IP="192.168.1.6"
-	NODE_USER="aea"
-	NODE_PORT=22
-
-2. Setup the connection type:
+2. Select the connection type:
 
        make direct-connection     # connect to remote target its IP address and port
-                                  # or 
+       # or 
        make proxy-connection      # meet with your target on a known server
 
 
@@ -83,11 +83,9 @@ Backups have following properties:
 
 ### Move your backups around carefully
 
-If you are not using **btrfs**, "dead simple copies" feature will bite you in the following way:
+If you are not using **btrfs**, "dead simple copies" feature has a problem by its design: As backups are just plain folders, this may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`** for such movements.
 
-Backups are just plain folders, which may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`**.
-
-If you are using `--method btrfs`, backups are made as readonly snapshots.
+> If you are using `--method btrfs`, backups are made as readonly snapshots, so you will not have such problems.
 
 ### Use correct filesystem
 
