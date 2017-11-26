@@ -1,14 +1,50 @@
 #!/bin/bash
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-CONFIG="$DIR/../config.sh"
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }; set_dir
+safe_source () { source $1; set_dir; }
+set_dir
+safe_source $DIR/aktos-bash-lib/btrfs-functions.sh
 
-ln -sf "./$(basename $DIR)/Makefile" "$DIR/../Makefile"
+PR=$(realpath $DIR/..)
+echo "Project root is: $PR"
+CONFIG="$PR/config.sh"
 
+echo "Creating link for Makefile"
+ln -sf "./$(basename $DIR)/toolset-makefile.mk" "$PR/Makefile"
+
+echo "Creating backups directory"
+backups_dir="$PR/backups"
+if [ ! -d $backups_dir ]; then
+    mkdir -p $PR/backups
+else
+    echo "..backups dir exists already."
+fi
+
+sync_root="$PR/sync-root"
+btrfs_flag="$PR/method-btrfs"
+hardlinks_flag="$PR/method-hardlinks"
+if [ ! -d $sync_root ]; then
+    echo "Guessing preferred backup method.."
+    if is_btrfs "$PR"; then
+        echo "..using btrfs method"
+        touch $btrfs_flag
+        rm $hardlinks_flag 2> /dev/null
+        btrfs sub create $sync_root
+    else
+        echo "..using hardlinks method"
+        touch $hardlinks_flag
+        rm $btrfs_flag 2> /dev/null
+        mkdir $sync_root
+    fi
+else
+    echo "..sync-root exists already, not configuring again."
+fi
+
+echo "Creating configuration file"
 if [[ ! -e "$CONFIG" ]]; then
   cp "$DIR/config-template.sh" "$CONFIG"
   nano "$CONFIG"
 else
-  echo "There is a configuration file already"
+  echo "..there is a configuration file already, use 'make configure' to configure"
 fi
 
-touch "$DIR/../up-to-date"
+touch "$PR/up-to-date"
