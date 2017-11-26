@@ -33,11 +33,11 @@ Assuming you are in `/path/to/your-project` folder already,
 
        ./dcs-tools/setup
 
-> Simplest configuration, assuming your target has the IP of `192.168.1.6`:
-> 
->     NODE_IP="192.168.1.6"
->     NODE_USER="aea"
->     NODE_PORT=22
+    > For the simplest configuration, assuming your target has the IP of `192.168.1.6`:
+    > 
+    >     NODE_IP="192.168.1.6"
+    >     NODE_USER="aea"
+    >     NODE_PORT=22
 
 2. Select the connection type:
 
