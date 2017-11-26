@@ -9,6 +9,8 @@ Since the `config.sh` is sourced, you can use any `bash` commands to generate th
 
 ## Direct Connection 
 
+Command: `make direct-connection`
+
 Used for direct connections that you would make if your target is on your LAN, on a outside network that you know its public IP, or connected with a direct LAN cable:
 
     NODE_IP="xx.yy.zz.tt"
@@ -17,6 +19,8 @@ Used for direct connections that you would make if your target is on your LAN, o
 
 
 ## Proxy Connection
+
+Command: `make proxy-connection`
 
 Proxy connection is a connection method that hides all details from you and lets you to meet with your target on a known server. See [proxy-connection.md](./proxy-connection.md) for details.
 
