@@ -15,6 +15,7 @@ This toolset is intended to use for managing remote Linux devices (RaspberryPi i
 * Linux OS
 * `git` (for submodule fetching and `make update`)
 * `rsync`
+* `sshfs`
 
 ### Setup
 
