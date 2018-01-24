@@ -42,9 +42,11 @@ Assuming you are in `/path/to/your-project` folder already,
 
 2. Select the connection type:
 
-       make direct-connection     # connect to remote target its IP address and port
-       # or 
-       make proxy-connection      # meet with your target on a known server
+       # either:
+       make conn-direct          # connect to remote target its IP address and port
+       
+       # or:
+       make conn-over-proxy      # meet with your target on a known server
 
 
 3. *(Optional)*: Send your RSA public key to the target in order to prevent asking password on every connection:

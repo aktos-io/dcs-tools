@@ -20,7 +20,7 @@ UP_TO_DATE := up-to-date
 
 .check-session: .check-update-needs
 	@if [[ ! -f $(DIRECT_SESSION) ]] && [[ ! -f $(PROXY_SESSION) ]]; then \
-		echo "ERROR: Set connection method first: make connection-..."; \
+		echo "ERROR: Set connection method first: make conn-..."; \
 		exit 0; \
 	fi
 
@@ -28,11 +28,11 @@ UP_TO_DATE := up-to-date
 	@rm $(DIRECT_SESSION) 2> /dev/null; true
 	@rm $(PROXY_SESSION) 2> /dev/null; true
 
-connection-directly: .clean-session
+conn-direct: .clean-session
 	@echo "creating direct session..."
 	touch $(DIRECT_SESSION)
 
-connection-over-proxy: .clean-session
+conn-over-proxy: .clean-session
 	@echo "creating proxy session..."
 	touch $(PROXY_SESSION)
 
