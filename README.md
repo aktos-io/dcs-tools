@@ -73,7 +73,7 @@ make conn-over-proxy
 make ssh
 ```
 
-Makes ssh connection either directly or via the link up server according to your connection type.
+Makes ssh connection either directly or via the link up server according to [your connection type](#set-connection-type).
 
 ### Mount target root
 
@@ -100,7 +100,7 @@ This command will only copy the current state of your target to your host machin
 make backup-sync-root
 ```
 
-Create a backup from the `sync-root` folder into `./backups` folder either by hardlinks method or by creating a btrfs subvolume, according to your `your-project/method-*` flag.
+Create a backup from the `sync-root` folder into `./backups` folder either by hardlinks method or by creating a btrfs subvolume, according to your `your-project/method-*` flag (`method-hardlinks` or `method-btrfs`).
 
 
 ## Advanced actions:
