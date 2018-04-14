@@ -1,12 +1,18 @@
 # Description
 
-This toolset is intended to use for managing remote Linux devices (RaspberryPi in mind, but any remote Linux system will work) from host Linux systems, by basically simplifying 5 tasks:
+This toolset is intended to use for managing remote Linux devices (RaspberryPi in mind, but any remote Linux system will work) from host Linux systems, by basically simplifying 5 tasks if you need to:
 
-1. You use `ssh` for performing remote tasks.
-2. You use `sshfs` for simple drag and drop style file transfers.
-3. You use `rsync` for backing up of target's entire root filesystem.
-4. You need to create incremental backups.
-5. You need to create bootable system disks from any of your backups locally.
+1. make `ssh` for performing remote tasks (either directly or by a link up server)
+2. use simple drag and drop style file transfers (by `sshfs`).
+3. backup the target's entire root filesystem (by `rsync`).
+4. create incremental backups.
+5. create bootable system disks from any of your backups locally.
+6. clone a target with a new identity
+
+This simplification is achieved by:
+
+ * Placing separate scripts for each task described above.
+ * Keeping the scripts, configuration settings and backups are kept in a folder called `your-project`.
 
 # Install
 
@@ -28,50 +34,135 @@ Follow these steps for every project:
 
 ### Configuration
 
-Assuming you are in `/path/to/your-project` folder already, 
+Assuming you are in `/path/to/your-project` folder already,
 
-1. Create your `config.sh` and mandatory folders/flags: 
+1. Create your configuration file and mandatory folders/flags:
 
        ./dcs-tools/setup
 
-    > For the simplest configuration, assuming your target has the IP of `192.168.1.6`:
-    > 
-    >     NODE_IP="192.168.1.6"
-    >     NODE_USER="aea"
-    >     NODE_PORT=22
+    > `NODE_IP=` the target IP you want to connect to
+    >
+    > `NODE_PORT` the SSH port (usually 22)
+    >
+    > `NODE_USER=` username for login
 
-2. Select the connection type:
+    > See [doc/configuration.md](./doc/configuration.md) for other options and explanations.
 
-       # either:
-       make conn-direct          # connect to remote target its IP address and port
-       
-       # or:
-       make conn-over-proxy      # meet with your target on a known server
-
+2. Set your connection type (see usage/1)
 
 3. *(Optional)*: Send your RSA public key to the target in order to prevent asking password on every connection:
 
        ./dcs-tools/make-target-settings  
 
-See [doc/configuration.md](./doc/configuration.md) for explanations.
+# Usage
 
-### Usage
+### Set connection type
 
+*either connect to your target by its direct IP address and port:*
 ```bash
-make ssh                # makes ssh
-make mount-root         # mounts the root folder to `your-project/NODE_ROOT`, later unmount with `make umount-root`
-make sync-root          # sync whole root partition of target with `your-project/sync-root` folder
-make backup-sync        # make a backup from the sync-root folder
+make conn-direct
+```
+*or  meet with your target on a link up server* (see [link-with-server](https://github.com/aktos-io/link-with-server))
+```bash
+make conn-over-proxy
 ```
 
-##### Advanced actions:
-
-Following tools are for advanced usage, use them with caution:
+### Make ssh
 
 ```bash
-./dcs-tools/produce-bootable-disk    # produce a bootable disk from any backup folder
-./dcs-tools/restore-from-backup      # restores all files from backup folder to SD card
+make ssh
 ```
+
+Makes ssh connection either directly or via the link up server according to your connection type.
+
+### Mount target root
+
+```bash
+make mount-root
+```
+Mounts the root folder to `your-project/NODE_ROOT`, which you can use for drag-n-drop style file transfers.
+
+You can later unmount with `make umount-root` without using `sudo` command.
+
+### Sync target's root folder
+
+```bash
+make sync-root
+```
+
+Sync whole root partition of the target with `your-project/sync-root` folder. You can use this command consecutively to keep your `sync-root` folder up to date as much as possible. Only differentiating data will be transmitted (if any).
+
+This command will only copy the current state of your target to your host machine. You will need to create your backups manually, with `make backup-sync-root` command
+
+### Create backups       
+
+```bash
+make backup-sync-root
+```
+
+Create a backup from the `sync-root` folder into `./backups` folder either by hardlinks method or by creating a btrfs subvolume, according to your `your-project/method-*` flag.
+
+
+## Advanced actions:
+
+Following tools are for advanced usage, use them **with extreme caution**.
+
+
+### Produce bootable disk from a backup
+
+```bash
+./dcs-tools/produce-bootable-disk [--help]   
+```
+
+Produces a bootable disk that is capable of booting your target hardware.
+
+
+### Restore files from a backup to physical disk
+
+```bash
+./dcs-tools/restore-from-backup [--help]
+```     
+Restores all files from backup folder to the SD card. Useful when you want to
+update your physical backup disk with your latest sync folder.
+
+### Convert to fresh install
+
+```bash
+./dcs-tools/convert-to-fresh-install [--help]
+```
+
+Modify a root folder (possibly a backup folder) in order to make it like a freshly installed target, by refreshing `etc/hostname`, `home/user/.ssh/...` etc.
+
+## Recipes
+
+### Cloning a target into a new target
+
+1. Create your `new-target` folder with and initialize the dcs-tools:
+
+       mkdir new-target
+       cd new-target
+       git clone --recursive https://github.com/aktos-io/dcs-tools
+       ./dcs-tools/setup
+
+2. Copy your `curr-target`'s backup folder:
+
+       sudo cp -al /path/to/curr-target/sync-root .
+
+3. Convert to a fresh install
+
+       ./dcs-tools/convert-to-fresh-install --root-dir sync-root/ ...
+
+4. Create a bootable disk
+
+       ./dcs-tools/produce-bootable-disk --backup ./sync-root/ --device ...
+
+5. Insert your bootable disk to your target device and power up. 
+
+
+### See Also
+
+[Helper methods](./doc/tips-and-tricks.md)
+
 
 # Advantages
 Backups have following properties:
@@ -95,7 +186,3 @@ If you are not using **btrfs**, "dead simple copies" feature has a problem by it
 Make sure that you are performing `make sync-root` command on a native Linux
 filesystem. You will end up having a backup with wrong file ownership and/or
 permissions otherwise.
-
-# See Also
-
-[Tips and tricks](./doc/tips-and-tricks.md)

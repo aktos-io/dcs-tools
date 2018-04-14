@@ -67,5 +67,5 @@ update:
 configure:
 	@nano $(PROJECT_ROOT)/config.sh
 
-backup-sync:
+backup-sync-root:
 	@$(TOOLS_DIR)/toolset-make-backup.sh
