@@ -98,18 +98,39 @@ while :; do
     shift
 done
 
-# check the arguments if they are valid
-if [[ ! -d $backup ]]; then
-    die "Backup directory must be provided! (not a dir: $backup)"
+# BE ABSOLUTELY SURE THAT THE DEVICE IS NOT A CURRENTLY USED DISK!!!
+if [[ ! -b $device ]]; then
+    echo_err "Physical device $device MUST exist"
+fi
+curr_disks=$(find_disks)
+press_enter_to_continue "Unplug the disk $device and press enter to continue."
+disk_diff=$(echo -n ${curr_disks#"$(find_disks)"})
+if [[ "$disk_diff" != "$device" ]]; then
+    echo_err "The device you unplugged must be the device you specified before. ($disk_diff)"
 else
-    echo_green "Using backup directory: $backup"
+    echo_green "$device seems to be the correct device."
+    press_enter_to_continue "Plug the disk again and press enter to continue."
 fi
 
 if [[ ! -b $device ]]; then
-    die "Bootable disk device must be provided"
+    echo_err "Physical device $device MUST exist"
 else
-    echo_green "Using device: $device"
+    echo_green "Using device:"
+    echo
+    lsblk $device | indent2
+    echo
 fi
+
+# Calculate partition prefix
+ppfx=
+if [ "${device//[[:digit:]]/}" == "/dev/mmcblk" ]; then
+    #echo "...this is obviously an SD Card"
+    ppfx="p"
+fi
+
+# Calculate boot and rootfs partitions
+BOOT_PART="${device}${ppfx}1"
+ROOT_PART="${device}${ppfx}2"
 
 if [ "$fstype" ]; then
     echo_green "Using filesystem type: $fstype"
@@ -121,6 +142,16 @@ fi
 if [ $skip_format ]; then
     echo_yellow "...will skip formatting..."
 fi
+
+echo_green "Using boot partition: $BOOT_PART"
+echo_green "Using rootfs partition: $ROOT_PART"
+
+if [[ ! -d $backup ]]; then
+    die "Backup directory must be provided! (not a dir: $backup)"
+else
+    echo_green "Using backup directory: $backup"
+fi
+
 
 if prompt_yes_no "Should we really continue?"; then
     echo_yellow "Bootable device $device will be built by using $backup"
@@ -134,15 +165,8 @@ fi
 #   All variables are set so far
 # -----------------------------------------------------------------------------
 
-# device partitions
-BOOT_PART="${device}p1"
-ROOT_PART="${device}p2"
-
-require_device $BOOT_PART
-require_device $ROOT_PART
-
-umount_if_mounted $BOOT_PART
-umount_if_mounted $ROOT_PART
+umount_if_mounted3 $BOOT_PART
+umount_if_mounted3 $ROOT_PART
 
 # mountpoints
 BOOT_MNT="$(mktemp -d --suffix=-boot)"
@@ -187,6 +211,9 @@ EOF
     # stick with ext3 for now
     mkfs.$fstype ${ROOT_PART}
 fi
+
+require_device $BOOT_PART
+require_device $ROOT_PART
 
 echo "Mounting partitions..."
 mount ${BOOT_PART} ${BOOT_MNT}
