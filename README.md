@@ -73,7 +73,7 @@ make conn-over-proxy
 make ssh
 ```
 
-Makes ssh connection either directly or via the link up server according to your connection type.
+Makes ssh connection either directly or via the link up server according to [your connection type](#set-connection-type).
 
 ### Mount target root
 
