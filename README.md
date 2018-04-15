@@ -40,9 +40,9 @@ Assuming you are in `/path/to/your-project` folder already,
 
        ./dcs-tools/setup
 
-    > `NODE_IP=` the IP address of the target 
-    > `NODE_PORT` the SSHD port (usually 22)
-    > `NODE_USER=` username for login
+    > `NODE_IP=` the IP address of the target \
+    > `NODE_PORT=` the SSHD port (normally 22) \
+    > `NODE_USER=` username for login \
     > 
     > See [doc/configuration.md](./doc/configuration.md) for other options and explanations.
 
