@@ -40,12 +40,10 @@ Assuming you are in `/path/to/your-project` folder already,
 
        ./dcs-tools/setup
 
-    > `NODE_IP=` the target IP you want to connect to
-    >
-    > `NODE_PORT` the SSH port (usually 22)
-    >
+    > `NODE_IP=` the IP address of the target 
+    > `NODE_PORT` the SSHD port (usually 22)
     > `NODE_USER=` username for login
-
+    > 
     > See [doc/configuration.md](./doc/configuration.md) for other options and explanations.
 
 2. Set your connection type (see usage/1)
@@ -66,6 +64,8 @@ make conn-direct
 ```bash
 make conn-over-proxy
 ```
+
+See [doc/configuration.md](./doc/configuration.md) for explanations.
 
 ### Make ssh
 
