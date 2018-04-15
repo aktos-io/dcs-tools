@@ -69,3 +69,14 @@ configure:
 
 backup-sync-root:
 	@$(TOOLS_DIR)/toolset-make-backup.sh
+
+method-hardlinks:
+	@rm -f $(PROJECT_ROOT)/method-* 2> /dev/null || true
+	@touch $(PROJECT_ROOT)/method-hardlinks
+	@echo "INFO: make backup-sync-root will use hardlinks method."
+
+method-btrfs:
+	@echo "WARNING: ./sync-root/ MUST be a BTRFS subvolume"
+	@rm -f $(PROJECT_ROOT)/method-* 2> /dev/null || true
+	@touch $(PROJECT_ROOT)/method-btrfs
+	@echo "INFO: make backup-sync-root will use btrfs method."
