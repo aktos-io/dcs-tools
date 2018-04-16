@@ -100,7 +100,7 @@ done
 
 # BE ABSOLUTELY SURE THAT THE DEVICE IS NOT A CURRENTLY USED DISK!!!
 if [[ ! -b $device ]]; then
-    echo_err "Physical device $device MUST exist"
+    die "Physical device $device MUST exist in the first place"
 fi
 curr_disks=$(find_disks)
 press_enter_to_continue "Unplug the disk $device and press enter to continue."
@@ -112,25 +112,25 @@ else
     press_enter_to_continue "Plug the disk again and press enter to continue."
 fi
 
-if [[ ! -b $device ]]; then
-    echo_err "Physical device $device MUST exist"
-else
-    echo_green "Using device:"
-    echo
-    lsblk $device | indent2
-    echo
-fi
+while :; do
+    if [[ ! -b $device ]]; then
+        echo "...waiting for $device to appear again..."
+    else
+        echo_green "Using device:"
+        echo
+        lsblk $device | indent2
+        echo
+        break
+    fi
+    sleep 2
+done
 
 # Calculate partition prefix
-ppfx=
+PARTITION_PREFIX=
 if [ "${device//[[:digit:]]/}" == "/dev/mmcblk" ]; then
     #echo "...this is obviously an SD Card"
-    ppfx="p"
+    PARTITION_PREFIX="p"
 fi
-
-# Calculate boot and rootfs partitions
-BOOT_PART="${device}${ppfx}1"
-ROOT_PART="${device}${ppfx}2"
 
 if [ "$fstype" ]; then
     echo_green "Using filesystem type: $fstype"
@@ -142,9 +142,6 @@ fi
 if [ $skip_format ]; then
     echo_yellow "...will skip formatting..."
 fi
-
-echo_green "Using boot partition: $BOOT_PART"
-echo_green "Using rootfs partition: $ROOT_PART"
 
 if [[ ! -d $backup ]]; then
     die "Backup directory must be provided! (not a dir: $backup)"
@@ -162,86 +159,8 @@ fi
 # end of check arguments
 
 # -----------------------------------------------------------------------------
-#   All variables are set so far
+#   All variables are set so far, include proper formatter
 # -----------------------------------------------------------------------------
 
-umount_if_mounted3 $BOOT_PART
-umount_if_mounted3 $ROOT_PART
-
-# mountpoints
-BOOT_MNT="$(mktemp -d --suffix=-boot)"
-ROOT_MNT="$(mktemp -d --suffix=-root)"
-echo "Using mount points: "
-echo "...Boot MNT: $BOOT_MNT"
-echo "...Root MNT: $ROOT_MNT"
-
-if [ ! $skip_format ]; then
-    echo "Creating partition table on ${device}..."
-    # to create the partitions programatically (rather than manually)
-    # we're going to simulate the manual input to fdisk
-    # The sed script strips off all the comments so that we can
-    # document what we're doing in-line with the actual commands
-    # Note that a blank line (commented as "default" will send a empty
-    # line terminated with a newline to take the fdisk default.
-    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${device}
-      o # clear the in memory partition table
-      n # new partition
-      p # primary partition
-      1 # partition number 1
-        # default - start at beginning of disk
-      +110M # boot parttion
-      t # change the type (1st partition will be selected automatically)
-      c # Changed type of partition 'Linux' to 'W95 FAT32 (LBA)', mandatory for RaspberryPi
-      n # new partition
-      p # primary partition
-      2 # partion number 2
-        # default, start immediately after preceding partition
-        # default, extend partition to end of disk
-      a # make a partition bootable
-      1 # bootable partition is partition 1 -- /dev/sda1
-      p # print the in-memory partition table
-      w # write the partition table
-      q # and we're done
-EOF
-
-
-    echo "Creating filesystem on device partitions..."
-    mkfs.vfat ${BOOT_PART}
-    # ext4 filesystem is problematic on Raspbian Jessie, so
-    # stick with ext3 for now
-    mkfs.$fstype ${ROOT_PART}
-fi
-
-require_device $BOOT_PART
-require_device $ROOT_PART
-
-echo "Mounting partitions..."
-mount ${BOOT_PART} ${BOOT_MNT}
-mount ${ROOT_PART} ${ROOT_MNT}
-
-echo "Restoring files from backup... (${backup})"
-rsync  -aHAXh "${backup}/boot/" ${BOOT_MNT}
-rsync  -aHAXh --exclude "boot" "${backup}/" ${ROOT_MNT}
-mkdir -p "${ROOT_MNT}/boot"
-
-echo "Setting /etc/resolv.conf attributes to make it immutable"
-chattr +i $ROOT_MNT/etc/resolv.conf
-
-
-echo "Syncing..."
-sync
-
-echo "unmounting devices.."
-umount ${BOOT_PART}
-umount ${ROOT_PART}
-
-echo "Removing mountpoints..."
-rmdir ${BOOT_MNT}
-rmdir ${ROOT_MNT}
-
-echo_yellow "Do not forget to check the following files on target: "
-echo_yellow " * /boot/cmdline.txt"
-echo_yellow " * /etc/fstab"
-echo_yellow " * /etc/network/interfaces"
-
-echo_green "Done..."
+#source $DIR/format-raspberry-pi.sh
+source $DIR/format-orange-pi.sh
