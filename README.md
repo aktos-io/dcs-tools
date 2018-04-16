@@ -42,11 +42,11 @@ Assuming you are in `/path/to/your-project` folder already,
 
     > `NODE_IP=` the IP address of the target \
     > `NODE_PORT=` the SSHD port (normally 22) \
-    > `NODE_USER=` username for login \
-    > 
+    > `NODE_USER=` username for login 
+    >
     > See [doc/configuration.md](./doc/configuration.md) for other options and explanations.
 
-2. Set your connection type (see usage/1)
+2. [Set your connection type](#set-connection-type)
 
 3. *(Optional)*: Send your RSA public key to the target in order to prevent asking password on every connection:
 
