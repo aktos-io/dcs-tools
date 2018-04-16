@@ -142,15 +142,12 @@ if [[ "$disk_diff" != "$device" ]]; then
     echo_err "The device you unplugged must be the device you specified before. ($disk_diff)"
 else
     echo_green "$device seems to be the correct device."
-    press_enter_to_continue "Plug the disk again and press enter to continue."
+    echo_yellow "Plug the disk again to continue..."
 fi
 
-while :; do
-    if [[ ! -b $device ]]; then
-        echo "...waiting for $device to appear again..."
-    else
-        break
-    fi
+# wait for device to appear again
+while [ ! -b $device ] ; do
+    #echo "...waiting for $device to appear again..."
     sleep 2
 done
 
@@ -162,17 +159,17 @@ if [ "${device//[[:digit:]]/}" == "/dev/mmcblk" ]; then
 fi
 
 # print the summary:
-echo_green "Summary: "
-echo_green "-----------------------------------"
-echo_green "Using filesystem type: $fstype"
+echo "Summary: "
+echo "-----------------------------------"
+echo "Using filesystem type: $fstype"
 if [ $skip_format ]; then
     echo_yellow "...will skip formatting..."
 fi
-echo_green "Using device:"
+echo "Using device:"
 echo
 lsblk $device | indent2
 echo
-echo_green "Using backup directory: .${backup#$PWD}"
+echo "Using backup directory: .${backup#$PWD}"
 
 if prompt_yes_no "Should we really continue?"; then
     PROJECT_ROOT=$(realpath "$DIR/..")
@@ -183,6 +180,12 @@ else
 fi
 
 # end of check arguments
+
+# Semantic variables
+FIRST_PARTITION="${PARTITION_PREFIX}1"
+SECOND_PARTITION="${PARTITION_PREFIX}2"
+THIRD_PARTITION="${PARTITION_PREFIX}3"
+FOURTH_PARTITION="${PARTITION_PREFIX}4"
 
 # -----------------------------------------------------------------------------
 #   All variables are set so far, include proper formatter
