@@ -28,9 +28,11 @@ verbose=0
 skip_format=
 
 die () {
-    errcho "ERROR: "
-    errcho "ERROR: $@"
-    errcho "ERROR: "
+    if [[ "$@" ]]; then
+        errcho "ERROR: "
+        errcho "ERROR: $@"
+        errcho "ERROR: "
+    fi
     show_help
     exit 5
 }
@@ -47,7 +49,8 @@ show_help () {
     --backup        : backup directory
     --device        : the device to format and create bootable disk
     --fs-type       : target filesystem type (default ext3)
-    --skip-format   : skip formatting target disk, only rsync.
+    --skip-format   : skip formatting target disk, only perform rsync
+    --hardware      : hardware type for formatting the disk
 
 HELP
 }
@@ -74,6 +77,15 @@ while :; do
                 die '"--device" requires a non-empty option argument.'
             fi
             ;;
+        --hardware)       # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                hardware=$2
+                shift
+            else
+                die '"--hardware" requires a non-empty option argument.'
+            fi
+            ;;
+
         --fs-type)       # Takes an option argument; ensure it has been specified.
             if [ "$2" ]; then
                 fstype=$2
@@ -98,6 +110,27 @@ while :; do
     shift
 done
 
+# check the arguments
+# -----------------------------------------------
+if [ "$fstype" == "" ]; then
+    fstype="ext3"
+    #echo_yellow "Using default $fstype type. "
+fi
+
+hardware="format-$hardware.sh"
+if [[ ! -f "$DIR/$hardware" ]]; then
+    formatters=$(ls $DIR/format-*.sh | xargs -n 1 basename | sed "s/format-\(.*\)\.sh/\1/")
+    echo_yellow "ERROR: One of the hardware types must be provided: "
+    for formatter in $formatters; do
+        echo_yellow "ERROR: * $formatter"
+    done
+    die "No such formatter found: $hardware"
+fi
+
+if [[ ! -d $backup ]]; then
+    die "Backup directory must be provided. (not a dir: $backup)"
+fi
+
 # BE ABSOLUTELY SURE THAT THE DEVICE IS NOT A CURRENTLY USED DISK!!!
 if [[ ! -b $device ]]; then
     die "Physical device $device MUST exist in the first place"
@@ -116,10 +149,6 @@ while :; do
     if [[ ! -b $device ]]; then
         echo "...waiting for $device to appear again..."
     else
-        echo_green "Using device:"
-        echo
-        lsblk $device | indent2
-        echo
         break
     fi
     sleep 2
@@ -132,30 +161,27 @@ if [ "${device//[[:digit:]]/}" == "/dev/mmcblk" ]; then
     PARTITION_PREFIX="p"
 fi
 
-if [ "$fstype" ]; then
-    echo_green "Using filesystem type: $fstype"
-else
-    fstype="ext3"
-    echo_yellow "Using default $fstype type. "
-fi
-
+# print the summary:
+echo_green "Summary: "
+echo_green "-----------------------------------"
+echo_green "Using filesystem type: $fstype"
 if [ $skip_format ]; then
     echo_yellow "...will skip formatting..."
 fi
-
-if [[ ! -d $backup ]]; then
-    die "Backup directory must be provided! (not a dir: $backup)"
-else
-    echo_green "Using backup directory: $backup"
-fi
-
+echo_green "Using device:"
+echo
+lsblk $device | indent2
+echo
+echo_green "Using backup directory: .${backup#$PWD}"
 
 if prompt_yes_no "Should we really continue?"; then
-    echo_yellow "Bootable device $device will be built by using $backup"
+    PROJECT_ROOT=$(realpath "$DIR/..")
+    echo_green "Building $device by using files from .${backup#$PWD}"
 else
     echo_info "Interrupted by user."
     exit 0
 fi
+
 # end of check arguments
 
 # -----------------------------------------------------------------------------
