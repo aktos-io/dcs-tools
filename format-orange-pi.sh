@@ -1,4 +1,4 @@
-# Working system `fdisk -l` output:
+# Working system's disk's `fdisk -l` output:
 # -------------------------------
 # Disk /dev/mmcblk0: 7.4 GiB, 7969177600 bytes, 15564800 sectors
 # Units: sectors of 1 * 512 = 512 bytes
@@ -15,14 +15,10 @@ echo_green "Formatting for Orange Pi"
 
 ROOT_PART="${device}${FIRST_PARTITION}"
 umount_if_mounted3 $ROOT_PART
-exit
 
 # mountpoints
-BOOT_MNT="$(mktemp -d --suffix=-boot)"
 ROOT_MNT="$(mktemp -d --suffix=-root)"
-echo "Using mount points: "
-echo "...Boot MNT: $BOOT_MNT"
-echo "...Root MNT: $ROOT_MNT"
+echo "Using mount point: $ROOT_MNT"
 
 if [ ! $skip_format ]; then
     echo "Creating partition table on ${device}..."
@@ -37,60 +33,38 @@ if [ ! $skip_format ]; then
       n # new partition
       p # primary partition
       1 # partition number 1
-        # default - start at beginning of disk
-      +110M # boot parttion
-      t # change the type (1st partition will be selected automatically)
-      c # Changed type of partition 'Linux' to 'W95 FAT32 (LBA)', mandatory for RaspberryPi
-      n # new partition
-      p # primary partition
-      2 # partion number 2
-        # default, start immediately after preceding partition
+      8192 # start definitely from this sector
         # default, extend partition to end of disk
-      a # make a partition bootable
-      1 # bootable partition is partition 1 -- /dev/sda1
       p # print the in-memory partition table
       w # write the partition table
       q # and we're done
 EOF
 
-
     echo "Creating filesystem on device partitions..."
-    mkfs.vfat ${BOOT_PART}
-    # ext4 filesystem is problematic on Raspbian Jessie, so
-    # stick with ext3 for now
+    echo_green "...creating $fstype for ROOT_PART ($ROOT_PART)"
     mkfs.$fstype ${ROOT_PART}
 fi
 
-require_device $BOOT_PART
 require_device $ROOT_PART
 
 echo "Mounting partitions..."
-mount ${BOOT_PART} ${BOOT_MNT}
 mount ${ROOT_PART} ${ROOT_MNT}
 
 echo "Restoring files from backup... (${backup})"
-rsync  -aHAXh "${backup}/boot/" ${BOOT_MNT}
-rsync  -aHAXh --exclude "boot" "${backup}/" ${ROOT_MNT}
-mkdir -p "${ROOT_MNT}/boot"
+rsync  -aHAXh "${backup}/" ${ROOT_MNT}
 
 echo "Setting /etc/resolv.conf attributes to make it immutable"
 chattr +i $ROOT_MNT/etc/resolv.conf
-
 
 echo "Syncing..."
 sync
 
 echo "unmounting devices.."
-umount ${BOOT_PART}
 umount ${ROOT_PART}
 
 echo "Removing mountpoints..."
-rmdir ${BOOT_MNT}
 rmdir ${ROOT_MNT}
 
 echo_yellow "Do not forget to check the following files on target: "
-echo_yellow " * /boot/cmdline.txt"
 echo_yellow " * /etc/fstab"
 echo_yellow " * /etc/network/interfaces"
-
-echo_green "Done..."

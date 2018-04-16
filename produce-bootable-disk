@@ -117,14 +117,14 @@ if [ "$fstype" == "" ]; then
     #echo_yellow "Using default $fstype type. "
 fi
 
-hardware="format-$hardware.sh"
-if [[ ! -f "$DIR/$hardware" ]]; then
+restore_script="$DIR/format-$hardware.sh"
+if [[ ! -f "$restore_script" ]]; then
     formatters=$(ls $DIR/format-*.sh | xargs -n 1 basename | sed "s/format-\(.*\)\.sh/\1/")
     echo_yellow "ERROR: One of the hardware types must be provided: "
     for formatter in $formatters; do
         echo_yellow "ERROR: * $formatter"
     done
-    die "No such formatter found: $hardware"
+    die "No such restore script found: $hardware"
 fi
 
 if [[ ! -d $backup ]]; then
@@ -132,11 +132,16 @@ if [[ ! -d $backup ]]; then
 fi
 
 # BE ABSOLUTELY SURE THAT THE DEVICE IS NOT A CURRENTLY USED DISK!!!
+if [[ "$device" == "" ]]; then
+    die "Physical device MUST be provided."
+fi
+
 if [[ ! -b $device ]]; then
     die "Physical device $device MUST exist in the first place"
 fi
 curr_disks=$(find_disks)
 press_enter_to_continue "Unplug the disk $device and press enter to continue."
+sleep 1
 disk_diff=$(echo -n ${curr_disks#"$(find_disks)"})
 if [[ "$disk_diff" != "$device" ]]; then
     echo_err "The device you unplugged must be the device you specified before. ($disk_diff)"
@@ -146,9 +151,10 @@ else
 fi
 
 # wait for device to appear again
+sleep 1
 while [ ! -b $device ] ; do
     #echo "...waiting for $device to appear again..."
-    sleep 2
+    sleep 1
 done
 
 # Calculate partition prefix
@@ -187,9 +193,8 @@ SECOND_PARTITION="${PARTITION_PREFIX}2"
 THIRD_PARTITION="${PARTITION_PREFIX}3"
 FOURTH_PARTITION="${PARTITION_PREFIX}4"
 
-# -----------------------------------------------------------------------------
-#   All variables are set so far, include proper formatter
-# -----------------------------------------------------------------------------
+#include proper restoration script
+source $restore_script
 
-#source $DIR/format-raspberry-pi.sh
-source $DIR/format-orange-pi.sh
+# if sourced formatter didn't exit till this point, process is succeeded
+echo_green "Done..."
