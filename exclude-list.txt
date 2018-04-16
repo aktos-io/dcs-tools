@@ -30,6 +30,8 @@
 *--no-sync
 /.*                                       # hidden files under root, eg. snapper snapshot dir
 /var/lib/lxcfs
-
+/var/lib/apt/lists
 **/.npm/_cacache
 /var/lib/mlocate/mlocate.db*
+
+/var/log.*
