@@ -1,6 +1,6 @@
 # Calculate boot and rootfs partitions
-BOOT_PART="${device}${PARTITION_PREFIX}1"
-ROOT_PART="${device}${PARTITION_PREFIX}2"
+BOOT_PART="${device}${FIRST_PARTITION}"
+ROOT_PART="${device}${SECOND_PARTITION}"
 
 umount_if_mounted3 $BOOT_PART
 umount_if_mounted3 $ROOT_PART
@@ -43,7 +43,10 @@ EOF
 
 
     echo "Creating filesystem on device partitions..."
+    echo_green "...creating FAT for BOOT_PART ($BOOT_PART)"
     mkfs.vfat ${BOOT_PART}
+
+    echo_green "...creating $fstype for ROOT_PART ($ROOT_PART)"
     # ext4 filesystem is problematic on Raspbian Jessie, so
     # stick with ext3 for now
     mkfs.$fstype ${ROOT_PART}
@@ -64,7 +67,6 @@ mkdir -p "${ROOT_MNT}/boot"
 echo "Setting /etc/resolv.conf attributes to make it immutable"
 chattr +i $ROOT_MNT/etc/resolv.conf
 
-
 echo "Syncing..."
 sync
 
@@ -80,5 +82,3 @@ echo_yellow "Do not forget to check the following files on target: "
 echo_yellow " * /boot/cmdline.txt"
 echo_yellow " * /etc/fstab"
 echo_yellow " * /etc/network/interfaces"
-
-echo_green "Done..."
