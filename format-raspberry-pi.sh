@@ -56,26 +56,27 @@ fi
 require_device $BOOT_PART
 require_device $ROOT_PART
 
-echo "Mounting partitions..."
+echo_green "Restoring files from backup to device..."
+echo "...mounting partitions"
 mount ${BOOT_PART} ${BOOT_MNT}
 mount ${ROOT_PART} ${ROOT_MNT}
 
-echo "Restoring files from backup... (${backup})"
+echo "...restoring files from backup (.${backup#$PWD}) (this may take a while...)"
 rsync  -aHAXh "${backup}/boot/" ${BOOT_MNT}
 rsync  -aHAXh --exclude "boot" "${backup}/" ${ROOT_MNT}
 mkdir -p "${ROOT_MNT}/boot"
 
-echo "Setting /etc/resolv.conf attributes to make it immutable"
+echo "...setting /etc/resolv.conf attributes to make it immutable"
 chattr +i $ROOT_MNT/etc/resolv.conf
 
-echo "Syncing..."
+echo "...syncing"
 sync
 
-echo "unmounting devices.."
+echo "...unmounting devices"
 umount ${BOOT_PART}
 umount ${ROOT_PART}
 
-echo "Removing mountpoints..."
+echo "...removing mountpoints"
 rmdir ${BOOT_MNT}
 rmdir ${ROOT_MNT}
 
