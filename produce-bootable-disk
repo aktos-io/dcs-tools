@@ -23,14 +23,15 @@ safe_source $DIR/aktos-bash-lib/fs-functions.sh
 
 backup=
 device=
-fstype=
 verbose=0
 skip_format=
 
 die () {
-    errcho "ERROR: "
-    errcho "ERROR: $@"
-    errcho "ERROR: "
+    if [[ "$@" ]]; then
+        errcho "ERROR: "
+        errcho "ERROR: $@"
+        errcho "ERROR: "
+    fi
     show_help
     exit 5
 }
@@ -46,8 +47,8 @@ show_help () {
 
     --backup        : backup directory
     --device        : the device to format and create bootable disk
-    --fs-type       : target filesystem type (default ext3)
-    --skip-format   : skip formatting target disk, only rsync.
+    --skip-format   : skip formatting target disk, only perform rsync
+    --hardware      : hardware type for formatting the disk
 
 HELP
 }
@@ -74,14 +75,15 @@ while :; do
                 die '"--device" requires a non-empty option argument.'
             fi
             ;;
-        --fs-type)       # Takes an option argument; ensure it has been specified.
+        --hardware)       # Takes an option argument; ensure it has been specified.
             if [ "$2" ]; then
-                fstype=$2
+                hardware=$2
                 shift
             else
-                die '"--fs-type" requires a non-empty option argument.'
+                die '"--hardware" requires a non-empty option argument.'
             fi
             ;;
+
         -v|--verbose)
             verbose=$((verbose + 1))  # Each -v adds 1 to verbosity.
             ;;
@@ -98,150 +100,85 @@ while :; do
     shift
 done
 
+# check the arguments
+# -----------------------------------------------
+restore_script="$DIR/format-$hardware.sh"
+if [[ ! -f "$restore_script" ]]; then
+    formatters=$(ls $DIR/format-*.sh | xargs -n 1 basename | sed "s/format-\(.*\)\.sh/\1/")
+    echo_yellow "ERROR: One of the hardware types must be provided: "
+    for formatter in $formatters; do
+        echo_yellow "ERROR: * $formatter"
+    done
+    die "No such restore script found: $hardware"
+fi
+
+if [[ ! -d $backup ]]; then
+    die "Backup directory must be provided. (not a dir: $backup)"
+fi
+
 # BE ABSOLUTELY SURE THAT THE DEVICE IS NOT A CURRENTLY USED DISK!!!
+if [[ "$device" == "" ]]; then
+    die "Physical device MUST be provided."
+fi
+
 if [[ ! -b $device ]]; then
-    echo_err "Physical device $device MUST exist"
+    die "Physical device $device MUST exist in the first place"
 fi
 curr_disks=$(find_disks)
 press_enter_to_continue "Unplug the disk $device and press enter to continue."
+sleep 1
 disk_diff=$(echo -n ${curr_disks#"$(find_disks)"})
 if [[ "$disk_diff" != "$device" ]]; then
     echo_err "The device you unplugged must be the device you specified before. ($disk_diff)"
 else
     echo_green "$device seems to be the correct device."
-    press_enter_to_continue "Plug the disk again and press enter to continue."
+    echo_yellow "Plug the disk again to continue..."
 fi
 
-if [[ ! -b $device ]]; then
-    echo_err "Physical device $device MUST exist"
-else
-    echo_green "Using device:"
-    echo
-    lsblk $device | indent2
-    echo
-fi
+# wait for device to appear again
+sleep 1
+while [ ! -b $device ] ; do
+    #echo "...waiting for $device to appear again..."
+    sleep 1
+done
 
 # Calculate partition prefix
-ppfx=
+PARTITION_PREFIX=
 if [ "${device//[[:digit:]]/}" == "/dev/mmcblk" ]; then
     #echo "...this is obviously an SD Card"
-    ppfx="p"
+    PARTITION_PREFIX="p"
 fi
 
-# Calculate boot and rootfs partitions
-BOOT_PART="${device}${ppfx}1"
-ROOT_PART="${device}${ppfx}2"
-
-if [ "$fstype" ]; then
-    echo_green "Using filesystem type: $fstype"
-else
-    fstype="ext3"
-    echo_yellow "Using default $fstype type. "
-fi
-
+# print the summary:
+echo "Summary: "
+echo "-----------------------------------"
 if [ $skip_format ]; then
     echo_yellow "...will skip formatting..."
 fi
-
-echo_green "Using boot partition: $BOOT_PART"
-echo_green "Using rootfs partition: $ROOT_PART"
-
-if [[ ! -d $backup ]]; then
-    die "Backup directory must be provided! (not a dir: $backup)"
-else
-    echo_green "Using backup directory: $backup"
-fi
-
+echo "Using device:"
+echo
+lsblk $device | indent2
+echo
+echo "Using backup directory: .${backup#$PWD}"
 
 if prompt_yes_no "Should we really continue?"; then
-    echo_yellow "Bootable device $device will be built by using $backup"
+    PROJECT_ROOT=$(realpath "$DIR/..")
+    echo_green "Building $device by using files from .${backup#$PWD}"
 else
     echo_info "Interrupted by user."
     exit 0
 fi
+
 # end of check arguments
 
-# -----------------------------------------------------------------------------
-#   All variables are set so far
-# -----------------------------------------------------------------------------
+# Semantic variables
+FIRST_PARTITION="${PARTITION_PREFIX}1"
+SECOND_PARTITION="${PARTITION_PREFIX}2"
+THIRD_PARTITION="${PARTITION_PREFIX}3"
+FOURTH_PARTITION="${PARTITION_PREFIX}4"
 
-umount_if_mounted3 $BOOT_PART
-umount_if_mounted3 $ROOT_PART
+#include proper restoration script
+source $restore_script
 
-# mountpoints
-BOOT_MNT="$(mktemp -d --suffix=-boot)"
-ROOT_MNT="$(mktemp -d --suffix=-root)"
-echo "Using mount points: "
-echo "...Boot MNT: $BOOT_MNT"
-echo "...Root MNT: $ROOT_MNT"
-
-if [ ! $skip_format ]; then
-    echo "Creating partition table on ${device}..."
-    # to create the partitions programatically (rather than manually)
-    # we're going to simulate the manual input to fdisk
-    # The sed script strips off all the comments so that we can
-    # document what we're doing in-line with the actual commands
-    # Note that a blank line (commented as "default" will send a empty
-    # line terminated with a newline to take the fdisk default.
-    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${device}
-      o # clear the in memory partition table
-      n # new partition
-      p # primary partition
-      1 # partition number 1
-        # default - start at beginning of disk
-      +110M # boot parttion
-      t # change the type (1st partition will be selected automatically)
-      c # Changed type of partition 'Linux' to 'W95 FAT32 (LBA)', mandatory for RaspberryPi
-      n # new partition
-      p # primary partition
-      2 # partion number 2
-        # default, start immediately after preceding partition
-        # default, extend partition to end of disk
-      a # make a partition bootable
-      1 # bootable partition is partition 1 -- /dev/sda1
-      p # print the in-memory partition table
-      w # write the partition table
-      q # and we're done
-EOF
-
-
-    echo "Creating filesystem on device partitions..."
-    mkfs.vfat ${BOOT_PART}
-    # ext4 filesystem is problematic on Raspbian Jessie, so
-    # stick with ext3 for now
-    mkfs.$fstype ${ROOT_PART}
-fi
-
-require_device $BOOT_PART
-require_device $ROOT_PART
-
-echo "Mounting partitions..."
-mount ${BOOT_PART} ${BOOT_MNT}
-mount ${ROOT_PART} ${ROOT_MNT}
-
-echo "Restoring files from backup... (${backup})"
-rsync  -aHAXh "${backup}/boot/" ${BOOT_MNT}
-rsync  -aHAXh --exclude "boot" "${backup}/" ${ROOT_MNT}
-mkdir -p "${ROOT_MNT}/boot"
-
-echo "Setting /etc/resolv.conf attributes to make it immutable"
-chattr +i $ROOT_MNT/etc/resolv.conf
-
-
-echo "Syncing..."
-sync
-
-echo "unmounting devices.."
-umount ${BOOT_PART}
-umount ${ROOT_PART}
-
-echo "Removing mountpoints..."
-rmdir ${BOOT_MNT}
-rmdir ${ROOT_MNT}
-
-echo_yellow "Do not forget to check the following files on target: "
-echo_yellow " * /boot/cmdline.txt"
-echo_yellow " * /etc/fstab"
-echo_yellow " * /etc/network/interfaces"
-
+# if sourced formatter didn't exit till this point, process is succeeded
 echo_green "Done..."
