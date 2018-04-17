@@ -46,9 +46,10 @@ EOF
     echo_green "...creating FAT for BOOT_PART ($BOOT_PART)"
     mkfs.vfat ${BOOT_PART}
 
-    echo_green "...creating $fstype for ROOT_PART ($ROOT_PART)"
     # ext4 filesystem is problematic on Raspbian Jessie, so
     # stick with ext3 for now
+    fstype="ext3"
+    echo_green "...creating $fstype for ROOT_PART ($ROOT_PART)"
     mkfs.$fstype ${ROOT_PART}
 fi
 
