@@ -23,7 +23,6 @@ safe_source $DIR/aktos-bash-lib/fs-functions.sh
 
 backup=
 device=
-fstype=
 verbose=0
 skip_format=
 
@@ -48,7 +47,6 @@ show_help () {
 
     --backup        : backup directory
     --device        : the device to format and create bootable disk
-    --fs-type       : target filesystem type (default ext3)
     --skip-format   : skip formatting target disk, only perform rsync
     --hardware      : hardware type for formatting the disk
 
@@ -86,14 +84,6 @@ while :; do
             fi
             ;;
 
-        --fs-type)       # Takes an option argument; ensure it has been specified.
-            if [ "$2" ]; then
-                fstype=$2
-                shift
-            else
-                die '"--fs-type" requires a non-empty option argument.'
-            fi
-            ;;
         -v|--verbose)
             verbose=$((verbose + 1))  # Each -v adds 1 to verbosity.
             ;;
@@ -112,11 +102,6 @@ done
 
 # check the arguments
 # -----------------------------------------------
-if [ "$fstype" == "" ]; then
-    fstype="ext3"
-    #echo_yellow "Using default $fstype type. "
-fi
-
 restore_script="$DIR/format-$hardware.sh"
 if [[ ! -f "$restore_script" ]]; then
     formatters=$(ls $DIR/format-*.sh | xargs -n 1 basename | sed "s/format-\(.*\)\.sh/\1/")
@@ -167,7 +152,6 @@ fi
 # print the summary:
 echo "Summary: "
 echo "-----------------------------------"
-echo "Using filesystem type: $fstype"
 if [ $skip_format ]; then
     echo_yellow "...will skip formatting..."
 fi
