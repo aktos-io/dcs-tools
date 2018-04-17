@@ -37,9 +37,8 @@ EOF
     mkfs.$fstype ${ROOT_PART}
 
     # Bootloader workaround
-    echo_yellow "WORKAROUND: Setting the UUID of root partition to old UUID"
     old_uuid=$(cat $backup/boot/armbianEnv.txt | grep rootdev | sed "s/rootdev=UUID=//")
-    echo "...changing UUID to $old_uuid"
+    echo_green "...changing UUID to $old_uuid"
     yes | tune2fs $ROOT_PART -U $old_uuid
 fi
 
