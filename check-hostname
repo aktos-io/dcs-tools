@@ -1,0 +1,22 @@
+#!/bin/bash 
+
+folder_name=$1
+controller_id=${folder_name##*-}
+[[ -z $controller_id ]] && { echo "controller id must be present"; exit 3; }
+echo "derived controller id: $controller_id"
+
+ssh aea@192.168.1.27 "export controller_id='$controller_id'" '; bash -s ' <<'ENDSSH'
+[ $(hostname) == $controller_id ] && exit 0 ||  exit 6;
+ENDSSH
+
+
+hostname_check=$?
+if [[ "$hostname_check" == "6" ]]; then
+    echo "Target hostname is not $controller_id, aborting!"
+    exit 7
+elif [[ "$hostname_check" == "0" ]]; then
+    echo "Target hostname is correct."
+    ssh aea@192.168.1.27
+else
+    echo "Unknown exit status: $hostname_check"
+fi
