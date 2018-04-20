@@ -7,8 +7,8 @@ SHELL := /bin/bash
 # PWD that the main Makefile runs
 PROJECT_ROOT := $(THIS_DIR)
 
-DIRECT_SESSION := comm-direct
-PROXY_SESSION := comm-tunnel
+DIRECT_SESSION := conn-direct
+PROXY_SESSION := conn-proxy
 
 UP_TO_DATE := up-to-date
 
@@ -28,11 +28,11 @@ UP_TO_DATE := up-to-date
 	@rm $(DIRECT_SESSION) 2> /dev/null; true
 	@rm $(PROXY_SESSION) 2> /dev/null; true
 
-comm-direct: .clean-session
+conn-direct: .clean-session
 	@echo "creating direct session..."
 	touch $(DIRECT_SESSION)
 
-comm-tunnel: .clean-session
+conn-proxy: .clean-session
 	@echo "creating proxy session..."
 	touch $(PROXY_SESSION)
 
@@ -64,7 +64,7 @@ update:
 	@$(TOOLS_DIR)/update.sh
 	touch $(UP_TO_DATE)
 
-configure:
+setup:
 	@nano $(PROJECT_ROOT)/config.sh
 
 backup-sync-root:
