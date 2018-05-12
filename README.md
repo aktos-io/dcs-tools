@@ -2,12 +2,12 @@
 
 This toolset is intended to use for managing remote Linux devices (RaspberryPi in mind, but any remote Linux system will work) from host Linux systems, by basically simplifying 5 tasks if you need to:
 
-1. make `ssh` for performing remote tasks (either directly or by a link up server)
-2. use simple drag and drop style file transfers (by `sshfs`).
-3. backup the target's entire root filesystem (by `rsync`).
-4. create incremental backups.
-5. create bootable system disks from any of your backups locally.
-6. clone a target with a new identity
+1. ... make `ssh` for performing remote tasks (either directly or by a link up server)
+2. ... use simple drag and drop style file transfers (by `sshfs`).
+3. ... backup the target's entire root filesystem (by `rsync`).
+4. ... create incremental backups.
+5. ... create a separate bootable system disk from any of your backups.
+6. ... clone a target with a new identity
 
 This simplification is achieved by:
 
