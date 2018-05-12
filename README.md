@@ -12,7 +12,7 @@ This toolset is intended to use for managing remote Linux devices (RaspberryPi i
 This simplification is achieved by:
 
  * Placing separate scripts for each task described above.
- * Keeping the scripts, configuration settings and backups are kept in a folder called `your-project`.
+ * Keeping the scripts, configuration files and backup folders in a folder called `your-project`.
 
 # Install
 
