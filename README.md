@@ -1,18 +1,18 @@
 # Description
 
-This toolset is intended to use for managing remote Linux devices (RaspberryPi in mind, but any remote Linux system will work) from host Linux systems, by basically simplifying 5 tasks if you need to:
+This toolset is intended to use for managing remote Linux devices (RaspberryPi in mind, but any remote Linux system will work) from host Linux systems, by basically simplifying 6 tasks, where you need to:
 
-1. ... make `ssh` for performing remote tasks (either directly or by a link up server)
-2. ... use simple drag and drop style file transfers (by `sshfs`).
-3. ... backup the target's entire root filesystem (by `rsync`).
-4. ... create incremental backups.
-5. ... create a separate bootable system disk from any of your backups.
-6. ... clone a target with a new identity
+1. ..make `ssh` for performing remote tasks (either directly or over a link up server).
+2. ..use simple drag and drop style file transfers (by `sshfs`).
+3. ..backup the target's entire root filesystem (by `rsync`).
+4. ..create fast and efficient **differential full backups** (by hardlinks or by BTRFS snapshots).
+5. ..create a separate bootable system disk from any of your backups.
+6. ..clone a target with a new identity.
 
 This simplification is achieved by:
 
- * Placing separate scripts for each task described above.
- * Keeping the scripts, configuration files and backup folders in a folder called `your-project`.
+ * Placing separate scripts for each task described above and providing a simple `Makefile`.
+ * Keeping the scripts, configuration files and backups in a folder called `your-project`.
 
 # Install
 
@@ -170,7 +170,7 @@ Modify a root folder (possibly a backup folder) in order to make it like a fresh
 Backups have following properties:
 
 * **portable** (you can move your copies around. eg: take first backup locally, remove disk, mound on another computer, `make backup-root` again)
-* **incremental** (only differences are transmitted)
+* **differential** (only differences are transmitted)
 * **dead simple copies** of original files (you can simply copy/paste when you need to restore or move your files around) **(see BIG WARNING)**
 * **versioned** : Take any number of full backups as much as you like. You are responsible for deleting old backups.
 * **efficient storage usage** (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks or BTRFS subvolumes)
