@@ -44,3 +44,5 @@ Host target
     IdentityFile $KEY_FILE
     ProxyJump linkup
 EOF
+
+chown $USER_NAME $SSH_CONFIG

@@ -20,6 +20,7 @@ fi
 
 safe_source $CONFIG
 USER_HOME=$(eval echo ~${SUDO_USER})
+USER_NAME=$(logname)
 
 # set the default configuration
 [ $NODE_USER ] || NODE_USER="aea"
@@ -41,6 +42,7 @@ touch $known_hosts_file
 
 # match with all hosts
 sed 's/^[^ ]* /\* /' $known_hosts_file > "${known_hosts_file}.bak111" && mv "${known_hosts_file}.bak111" $known_hosts_file
+chown $USER_NAME $known_hosts_file
 
 custom_known_hosts="-o UserKnownHostsFile=$known_hosts_file \
     -o StrictHostKeyChecking=ask \
