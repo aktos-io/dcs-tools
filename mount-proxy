@@ -18,9 +18,9 @@ user=${beforeat#*-}
 
 cat > $tmp <<EOF
 Host linkup_normal  # <- this is a workaround for now
-    Hostname $servername
-    Port $port
-    User    $user
+    Hostname    $servername
+    Port        $port
+    User        $user
 
 Host linkup     # <- we actually prefer this one, but connection is broken for large files
     ControlMaster auto
@@ -30,19 +30,12 @@ Host target
     Hostname localhost
     Port $NODE_RENDEZVOUS_PORT
     User $NODE_USER
-    #ProxyCommand ssh linkup_normal -W %h:%p  # <- this doesn't seem to have any effects, why?
+    ProxyJump linkup_normal
 EOF
 
 echo_yellow "FIXME: Parsing proxy file name: $SSH_SOCKET_FILE"
 
-# debugging purposes
-#cat $tmp
-
-$SSHFS -F $tmp -o ssh_command="ssh -J linkup_normal" target:/ $MOUNT_DIR
-
-# FIXME: preferred way:
-#$SSHFS -F $tmp target:/ $MOUNT_DIR
-
+$SSHFS -F $tmp target:/ $MOUNT_DIR
 rm $tmp
 
 # Create a symbolic link to actual mount dir

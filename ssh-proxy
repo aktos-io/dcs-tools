@@ -10,15 +10,23 @@ if [[ $params ]]; then
     echo_yellow "params: $params"
 fi
 
+# Generate project specific SSH config file
+# see https://superuser.com/q/1253960/187576 for older SSH clients
 tmp=$(mktemp)
 
 cat > $tmp <<EOF
-Host hello
-ControlMaster auto
-ControlPath $SSH_SOCKET_FILE
+Host linkup
+    ControlMaster auto
+    ControlPath $SSH_SOCKET_FILE
+
+Host target
+    User $NODE_USER
+    Hostname localhost
+    Port $NODE_RENDEZVOUS_PORT
+    IdentityFile $KEY_FILE
+    ProxyJump linkup
 EOF
 
 echo_green "Using proxy file: $SSH_SOCKET_FILE"
-$SSH -F $tmp -J hello $NODE_USER@localhost -p $NODE_RENDEZVOUS_PORT -i $KEY_FILE $params
-
+$SSH -F $tmp target $params
 rm $tmp
