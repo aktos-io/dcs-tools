@@ -1,9 +1,46 @@
 #!/bin/bash
+set -e
 set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
 safe_source () { source $1; set_dir; }
 set_dir
 
-safe_source $DIR/common.sh
-$DIR/create-tunnel
+if [[ $(id -u) > 0 ]]; then sudo $0 "$@"; exit; fi
 
-$DIR/sync-over-ssh --source $NODE_USER@localhost:$NODE_RENDEZVOUS_PORT/ --sync-dir $DIR/../sync-root
+safe_source $DIR/aktos-bash-lib/basic-functions.sh
+safe_source $DIR/aktos-bash-lib/fs-functions.sh
+safe_source $DIR/aktos-bash-lib/ssh-functions.sh
+
+safe_source $DIR/common.sh
+$DIR/create-ssh-config
+
+sync_dir=$(realpath $DIR/../sync-root)
+source="/"
+RSYNC="nice -n19 ionice -c3 rsync"
+
+die () {
+    errcho "ERROR: "
+    errcho "ERROR: $@"
+    errcho "ERROR: "
+    show_help
+    exit 255
+}
+
+if [[ ! -d $sync_dir ]]; then
+    die "sync directory must exist: $sync_dir"
+else
+    echo_green "Using sync directory: $sync_dir"
+fi
+
+if prompt_yes_no "Should we really continue?"; then
+    echo_yellow "syncs will go to: $sync_dir"
+else
+    echo_info "Interrupted by user."
+    exit 0
+fi
+
+start_timer
+
+$RSYNC -aHAXvPh --delete --delete-excluded --exclude-from "$DIR/exclude-list.txt" \
+	--rsh="ssh -F $SSH_CONFIG" --rsync-path="sudo rsync" target_normal:$source $sync_dir
+
+show_timer "sync completed in:"

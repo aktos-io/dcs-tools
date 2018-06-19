@@ -1,0 +1,46 @@
+#!/bin/bash
+set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
+safe_source () { source $1; set_dir; }
+set_dir
+safe_source $DIR/common.sh
+
+# Generate project specific SSH config file
+# see https://superuser.com/q/1253960/187576 for older SSH clients
+
+# Workaround for linkup_normal creation which is a workaround for linkup
+arg=$SSH_SOCKET_FILE
+beforeat=${arg%@*}
+afterat=${arg#*@}
+servername=${afterat%:*}
+port=${afterat#*:}
+port=${port%.*}
+user=${beforeat#*-}
+
+cat > $SSH_CONFIG <<EOF
+
+# WORKAROUND
+Host linkup_normal  # <- this is a workaround for now
+    Hostname    $servername
+    Port        $port
+    User        $user
+    IdentityFile $KEY_FILE
+
+Host target_normal
+    Hostname localhost
+    Port $NODE_RENDEZVOUS_PORT
+    User $NODE_USER
+    IdentityFile $KEY_FILE
+    ProxyJump linkup_normal
+# /WORKAROUND
+
+Host linkup
+    ControlMaster auto
+    ControlPath $SSH_SOCKET_FILE
+
+Host target
+    User $NODE_USER
+    Hostname localhost
+    Port $NODE_RENDEZVOUS_PORT
+    IdentityFile $KEY_FILE
+    ProxyJump linkup
+EOF

@@ -19,10 +19,11 @@ if [[ ! -f $CONFIG ]]; then
 fi
 
 safe_source $CONFIG
+USER_HOME=$(eval echo ~${SUDO_USER})
 
 # set the default configuration
 [ $NODE_USER ] || NODE_USER="aea"
-[ $KEY_FILE ] || KEY_FILE="$HOME/.ssh/id_rsa"
+[ $KEY_FILE ] || KEY_FILE="$USER_HOME/.ssh/id_rsa"
 [ $MOUNT_DIR ] || MOUNT_DIR=$(mktemp -d)
 [ $NODE_PORT ] || NODE_PORT=22
 if [ $RENDEZVOUS_HOST ]; then
@@ -31,6 +32,7 @@ if [ $RENDEZVOUS_HOST ]; then
     [ $NODE_RENDEZVOUS_PORT ] || die "Target node's sshd port on rendezvous server is required"
     echo_green "Using rendezvous server: $RENDEZVOUS_USER@$RENDEZVOUS_HOST:$RENDEZVOUS_PORT -> $NODE_RENDEZVOUS_PORT"
 fi
+SSH_CONFIG="$DIR/../ssh-config"
 
 NODE_MOUNT_LINK="$DIR/../NODE_ROOT"
 

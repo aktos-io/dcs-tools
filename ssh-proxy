@@ -4,29 +4,12 @@ safe_source () { source $1; set_dir; }
 set_dir
 safe_source $DIR/common.sh
 
-#$DIR/create-tunnel
+$DIR/create-ssh-config
+
 params="$@"
 if [[ $params ]]; then
     echo_yellow "params: $params"
 fi
 
-# Generate project specific SSH config file
-# see https://superuser.com/q/1253960/187576 for older SSH clients
-tmp=$(mktemp)
-
-cat > $tmp <<EOF
-Host linkup
-    ControlMaster auto
-    ControlPath $SSH_SOCKET_FILE
-
-Host target
-    User $NODE_USER
-    Hostname localhost
-    Port $NODE_RENDEZVOUS_PORT
-    IdentityFile $KEY_FILE
-    ProxyJump linkup
-EOF
-
 echo_green "Using proxy file: $SSH_SOCKET_FILE"
-$SSH -F $tmp target $params
-rm $tmp
+$SSH -F $SSH_CONFIG target $params
