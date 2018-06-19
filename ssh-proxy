@@ -4,9 +4,21 @@ safe_source () { source $1; set_dir; }
 set_dir
 safe_source $DIR/common.sh
 
-$DIR/create-tunnel
+#$DIR/create-tunnel
 params="$@"
 if [[ $params ]]; then
     echo_yellow "params: $params"
 fi
-$SSH $NODE_USER@localhost -p $NODE_RENDEZVOUS_PORT -i $KEY_FILE $params
+
+tmp=$(mktemp)
+
+cat > $tmp <<EOF
+Host hello
+ControlMaster auto
+ControlPath $SSH_SOCKET_FILE
+EOF
+
+echo_green "Using proxy file: $SSH_SOCKET_FILE"
+$SSH -F $tmp -J hello $NODE_USER@localhost -p $NODE_RENDEZVOUS_PORT -i $KEY_FILE $params
+
+rm $tmp
