@@ -12,4 +12,4 @@ if [[ $params ]]; then
 fi
 
 echo_green "Using proxy file: $SSH_SOCKET_FILE"
-$SSH -F $SSH_CONFIG target $params
+$SSH -F $SSH_CONFIG target_normal $params
