@@ -1,9 +1,9 @@
 ## Direct connection settings
-NODE_IP=""
-NODE_USER=""
-NODE_PORT=22
+NODE_USER="pi"
+NODE_ADDR="192.168.1.5:1234"
 
-## Proxy connection settings 
+## Proxy connection settings
+PROXY_USER="foo"
+PROXY_ADDR="example.com:2222"
+NODE_PROXY_PORT=12345
 ## (see doc/configuration.md for details)
-#SSH_SOCKET_FILE="/path/to/your-socket-file"
-#NODE_RENDEZVOUS_PORT=1234

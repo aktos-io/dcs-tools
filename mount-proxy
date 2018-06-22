@@ -4,12 +4,8 @@ safe_source () { source $1; set_dir; }
 safe_source $DIR/common.sh
 
 $DIR/create-ssh-config
-
-echo_yellow "FIXME: Parsing proxy file name: $SSH_SOCKET_FILE"
-
-$SSHFS -F $SSH_CONFIG target_normal:/ $MOUNT_DIR
+$SSHFS target_proxy:/ $MOUNT_DIR
 
 # Create a symbolic link to actual mount dir
 rm $NODE_MOUNT_LINK 2> /dev/null
 ln -sf $MOUNT_DIR $NODE_MOUNT_LINK
-

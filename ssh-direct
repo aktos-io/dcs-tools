@@ -11,4 +11,4 @@ echo_green "Using direct connection: $NODE_IP:$NODE_PORT"
 if [[ $params ]]; then
     echo_yellow "params: $params"
 fi
-$SSH $NODE_USER@$NODE_IP -p $NODE_PORT -i $KEY_FILE $params
+$SSH target_direct $params

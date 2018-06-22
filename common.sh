@@ -6,37 +6,40 @@ safe_source $DIR/aktos-bash-lib/basic-functions.sh
 safe_source $DIR/aktos-bash-lib/ssh-functions.sh
 
 CONFIG=$DIR/../config.sh
-
-if [[ -f $DIR/config.sh ]]; then
-    echo_yellow "DEPRECATION:"
-    echo_yellow "Configuration file (config.sh) should be in project directory"
-    mv $DIR/config.sh $CONFIG
-fi
-
 if [[ ! -f $CONFIG ]]; then
-    echo_yellow "You need to configure first"
+    echo_yellow "You need to configure first, run './setup'"
     exit
 fi
 
+# Grab the user configuration and parse the variables, assign the defaults
 safe_source $CONFIG
+
 USER_HOME=$(eval echo ~${SUDO_USER})
 USER_NAME=$(logname)
 
 # set the default configuration
 [ $NODE_USER ] || NODE_USER="aea"
+if [[ ! -z $NODE_ADDR ]]; then
+    NODE_IP=${NODE_ADDR%:*}
+    NODE_PORT=${NODE_ADDR#*:}
+    [ $NODE_PORT == $NODE_IP ] && NODE_PORT=
+fi
+[ $NODE_PORT ] || NODE_PORT=22
+#echo "Node addr: $NODE_ADDR, node ip: $NODE_IP, node port: $NODE_PORT"
+
 [ $KEY_FILE ] || KEY_FILE="$USER_HOME/.ssh/id_rsa"
 [ $MOUNT_DIR ] || MOUNT_DIR=$(mktemp -d)
-[ $NODE_PORT ] || NODE_PORT=22
-if [ $RENDEZVOUS_HOST ]; then
-    [ $RENDEZVOUS_USER ] || die "Rendezvous username is required"
-    [ $RENDEZVOUS_PORT ] || RENDEZVOUS_PORT=443
-    [ $NODE_RENDEZVOUS_PORT ] || die "Target node's sshd port on rendezvous server is required"
-    echo_green "Using rendezvous server: $RENDEZVOUS_USER@$RENDEZVOUS_HOST:$RENDEZVOUS_PORT -> $NODE_RENDEZVOUS_PORT"
+if [ $PROXY_ADDR ]; then
+    [ $PROXY_USER ] || die "Linkup server username is required"
+    PROXY_HOST=${PROXY_ADDR%:*}
+    PROXY_PORT=${PROXY_ADDR#*:}
+    [ $PROXY_PORT == $PROXY_HOST ] && PROXY_PORT=22
+    [ $NODE_PROXY_PORT ] || die "NODE Linkup port is required"
+    #echo "Linkup server is set up: $PROXY_HOST on port $PROXY_PORT --> $NODE_PROXY_PORT"
 fi
-SSH_CONFIG="$DIR/../ssh-config"
 
+SSH_CONFIG=$(realpath "$DIR/../ssh-config")
 NODE_MOUNT_LINK="$DIR/../NODE_ROOT"
-
 known_hosts_file=$(realpath $DIR/../known_hosts)
 touch $known_hosts_file
 
@@ -48,5 +51,6 @@ custom_known_hosts="-o UserKnownHostsFile=$known_hosts_file \
     -o StrictHostKeyChecking=ask \
     -o CheckHostIP=no "
 
-SSH="$SSH $custom_known_hosts -o HashKnownHosts=no "
-SSHFS="$SSHFS $custom_known_hosts"
+
+SSH="$SSH $custom_known_hosts -o HashKnownHosts=no -F $SSH_CONFIG "
+SSHFS="$SSHFS $custom_known_hosts -F $SSH_CONFIG "

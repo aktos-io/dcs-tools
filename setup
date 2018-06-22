@@ -44,7 +44,7 @@ if [[ ! -e "$CONFIG" ]]; then
   cp "$DIR/config-template.sh" "$CONFIG"
   nano "$CONFIG"
 else
-  echo "..there is a configuration file already, use 'make configure' to configure"
+  echo "..there is a configuration file already, use 'make setup' to setup"
 fi
 
 touch "$PR/up-to-date"

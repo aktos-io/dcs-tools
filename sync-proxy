@@ -41,6 +41,6 @@ fi
 start_timer
 
 $RSYNC -aHAXvPh --delete --delete-excluded --exclude-from "$DIR/exclude-list.txt" \
-	--rsh="ssh -F $SSH_CONFIG" --rsync-path="sudo rsync" target_normal:$source $sync_dir
+	--rsh="ssh -F $SSH_CONFIG" --rsync-path="sudo rsync" target_proxy:$source $sync_dir
 
 show_timer "sync completed in:"

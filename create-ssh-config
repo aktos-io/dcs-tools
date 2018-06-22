@@ -6,43 +6,30 @@ safe_source $DIR/common.sh
 
 # Generate project specific SSH config file
 # see https://superuser.com/q/1253960/187576 for older SSH clients
-
-# Workaround for linkup_normal creation which is a workaround for linkup
-arg=$SSH_SOCKET_FILE
-beforeat=${arg%@*}
-afterat=${arg#*@}
-servername=${afterat%:*}
-port=${afterat#*:}
-port=${port%.*}
-user=${beforeat#*-}
-
 cat > $SSH_CONFIG <<EOF
-
-# WORKAROUND
-Host linkup_normal  # <- this is a workaround for now
-    Hostname    $servername
-    Port        $port
-    User        $user
+Host *
+    UserKnownHostsFile $known_hosts_file
     IdentityFile $KEY_FILE
 
-Host target_normal
-    Hostname localhost
-    Port $NODE_RENDEZVOUS_PORT
+Host target_direct
+    Hostname $NODE_IP
+    Port $NODE_PORT
     User $NODE_USER
-    IdentityFile $KEY_FILE
-    ProxyJump linkup_normal
-# /WORKAROUND
-
-Host linkup
-    ControlMaster auto
-    ControlPath $SSH_SOCKET_FILE
-
-Host target
-    User $NODE_USER
-    Hostname localhost
-    Port $NODE_RENDEZVOUS_PORT
-    IdentityFile $KEY_FILE
-    ProxyJump linkup
 EOF
+
+if [[ ! -z $PROXY_ADDR ]]; then
+    cat >> $SSH_CONFIG <<EOF
+Host proxy
+    Hostname    $PROXY_HOST
+    Port        $PROXY_PORT
+    User        $PROXY_USER
+
+Host target_proxy
+    Hostname localhost
+    Port $NODE_PROXY_PORT
+    User $NODE_USER
+    ProxyJump proxy
+EOF
+fi
 
 chown $USER_NAME $SSH_CONFIG
