@@ -55,9 +55,9 @@ umount-root:
 
 sync-root: .check-session
 	@if [[ -f $(DIRECT_SESSION) ]]; then \
-		$(TOOLS_DIR)/sync-direct; \
+		$(TOOLS_DIR)/sync.sh direct; \
 	elif [[ -f $(PROXY_SESSION) ]]; then \
-		$(TOOLS_DIR)/sync-proxy; \
+		$(TOOLS_DIR)/sync.sh proxy; \
 	fi
 
 update:

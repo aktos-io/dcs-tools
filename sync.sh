@@ -25,6 +25,9 @@ die () {
     exit 255
 }
 
+conn_method=$1
+[ $conn_method ] || die "Connection method must be provided"
+
 if [[ ! -d $sync_dir ]]; then
     die "sync directory must exist: $sync_dir"
 else
@@ -41,6 +44,6 @@ fi
 start_timer
 
 $RSYNC -aHAXvPh --delete --delete-excluded --exclude-from "$DIR/exclude-list.txt" \
-	--rsh="ssh -F $SSH_CONFIG" --rsync-path="sudo rsync" target_proxy:$source $sync_dir
+	--rsh="$SSH" --rsync-path="sudo rsync" target_$conn_method:$source $sync_dir
 
 show_timer "sync completed in:"
