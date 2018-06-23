@@ -5,6 +5,7 @@ safe_source () { source $1; set_dir; }
 set_dir
 
 safe_source $DIR/common.sh
+$DIR/create-ssh-config
 
 params="$@"
 echo_green "Using direct connection: $NODE_IP:$NODE_PORT"
