@@ -19,6 +19,7 @@ EOF
 
 if [[ ! -z $PROXY_ADDR ]]; then
     cat >> $SSH_CONFIG <<EOF
+
 Host proxy
     Hostname    $PROXY_HOST
     Port        $PROXY_PORT
