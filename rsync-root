@@ -1,0 +1,17 @@
+#!/bin/bash
+set -u -o pipefail
+set_dir(){ _dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; }; set_dir
+safe_source () { source $1; set_dir; }
+# end of bash boilerplate
+
+# Description 
+# This is a general purpose root folder sync script.
+
+exclude_list=$_dir/exclude-list.txt
+# this was originally ./exclude-list.txt
+[[ -f $exclude_list ]] || { echo "exclude-list.txt is missing, won't continue"; exit 1; }
+
+# All checks are done, run as root.
+[[ $(whoami) = "root" ]] || { sudo $0 $*; exit 0; }
+
+rsync -aHAXvPh --delete --delete-excluded --exclude-from $exclude_list $1/ $2
