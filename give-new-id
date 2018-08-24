@@ -128,9 +128,10 @@ if [[ $skip_ssh_keys = false ]]; then
     for user in `ls $root_dir/home`; do
         echo "...for $user"
         if [[ $dry_run = false ]]; then
-            ssh_dir=$root_dir/home/$user/.ssh
-            mkdir -p $ssh_dir
-            yes y | ssh-keygen -t rsa -b 4096 -N "" -C "$user@$new_hostname" -f $ssh_dir/id_rsa
+            ssh_file=$root_dir/home/$user/.ssh/id_rsa
+            mkdir -p $(dirname $ssh_file)
+            [[ -f $ssh_file ]] && rm $ssh_file
+            ssh-keygen -q -t rsa -b 4096 -N "" -C "$user@$new_hostname" -f $ssh_file
         fi
     done
 
@@ -141,7 +142,7 @@ if [[ $skip_ssh_keys = false ]]; then
         find $ssh_dir -name 'ssh_host_*' | while IFS= read -r key; do
             [[ ${key##*.} = "bak" ]] && continue
             if [[ ${key##*.} = "pub" ]]; then
-                echo "Cleaning up $key"
+                #echo "Cleaning up $key"
                 rm $key
                 continue
             fi
@@ -156,9 +157,9 @@ if [[ $skip_ssh_keys = false ]]; then
                     params="-b 521"
                     ;;
             esac
-            echo_green "Generating $key with type: $key_type"
+            echo "...generating $key"
             mv $key $key.bak
-            ssh-keygen -t $key_type $params -N '' -C "root@$new_hostname" -f $key
+            ssh-keygen -q -t $key_type $params -N '' -C "root@$new_hostname" -f $key
             if [[ $? -gt 0 ]]; then
                 echo_yellow "Error occurred, restoring $key"
                 mv $key.bak $key
