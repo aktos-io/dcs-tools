@@ -92,7 +92,7 @@ This command will only copy the current state of your target to your host machin
 make backup-sync-root
 ```
 
-Create a backup from the `sync-root` folder into `./backups` folder either by hardlinks method or by creating a btrfs subvolume, according to your `your-project/method-*` flag. 
+Create a backup from the `sync-root` folder into `./backups` folder either by hardlinks method or by creating a btrfs subvolume, according to your `your-project/method-*` flag.
 
 > `method-*` flags can be set by `make method-btrfs` or `make method-hardlinks` commands.
 
@@ -119,13 +119,14 @@ Produces a bootable disk that is capable of booting your target hardware.
 Restores all files from backup folder to the SD card. Useful when you want to
 update your physical backup disk with your latest sync folder.
 
-### Convert to fresh install
+### Give New ID
+
+Make appropriate changes to give new identity to an installation. Useful for creating
+a new controller/machine based on current installation.
 
 ```bash
-./dcs-tools/convert-to-fresh-install [--help]
+./dcs-tools/give-new-id [--help]
 ```
-
-Modify a root folder (possibly a backup folder) in order to make it like a freshly installed target, by refreshing `etc/hostname`, `home/user/.ssh/...` etc.
 
 ## Recipes
 
@@ -150,7 +151,7 @@ Modify a root folder (possibly a backup folder) in order to make it like a fresh
 
        ./dcs-tools/produce-bootable-disk --backup ./sync-root/ --device ...
 
-5. Insert your bootable disk to your target device and power up. 
+5. Insert your bootable disk to your target device and power up.
 
 
 ### See Also

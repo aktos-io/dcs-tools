@@ -1,0 +1,177 @@
+#!/bin/bash
+set -eu -o pipefail
+safe_source () { [[ ! -z ${1:-} ]] && source $1; _dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; _sdir=$(dirname "$(readlink -f "$0")"); }; safe_source
+# end of bash boilerplate
+
+safe_source $_sdir/aktos-bash-lib/basic-functions.sh
+
+show_help () {
+    cat <<EOF
+
+    usage:
+
+        $(basename $0) ...options
+
+    options:
+
+        --root-dir          : Root dir to manipulate
+        --hostname          : New hostname ("auto" to auto-generate)
+
+        --skip-ssh-keys     : Skip generating a new ssh key
+        --dry-run           : Do not make any real changes
+        --info              : Produce info about target
+
+EOF
+}
+
+die () {
+    echo "ERROR:"
+    echo "ERROR: $@"
+    echo "ERROR:"
+    show_help
+    exit 55
+}
+
+# initialize variables
+skip_ssh_keys=false
+root_dir=
+new_hostname=
+info=false
+dry_run=false
+
+# Parse command line arguments
+args=("$@")
+_count=1
+while :; do
+    key="${1:-}"
+    case $key in
+        -h|-\?|--help|'')
+            show_help    # Display a usage synopsis.
+            exit
+            ;;
+        # --------------------------------------------------------
+        --dry-run) shift
+            dry_run=true
+            ;;
+        --root-dir) shift
+            if [[ ! -z ${1:-} ]]; then
+                root_dir=$1
+                shift
+            fi
+            ;;
+        --hostname) shift
+            new_hostname="$1"
+            shift
+            if [[ $new_hostname = "auto" ]]; then
+                new_hostname=$(printf '0x%x' $(date +%s))
+                new_hostname=${new_hostname/0x}
+                echo "Automatically setting hostname to $new_hostname"
+            fi
+            ;;
+        --info) shift
+            info=true
+            ;;
+        --skip-ssh-keys) shift
+            skip_ssh_keys=true
+            ;;
+        # --------------------------------------------------------
+        *)  # generate the positional arguments
+            declare _arg$((_count++))="$1"
+            shift
+    esac
+    [[ -z ${1:-} ]] && break
+done; set -- "${args[@]}"
+# use $_arg1 in place of $1, $_arg2 in place of $2 and so on, "$@" is intact
+
+# Check the parameters
+[[ -d $root_dir ]] || die "Root dir is required"
+hostname_file=$root_dir/etc/hostname
+orig_hostname=$(cat $hostname_file)
+
+if [[ $info = true ]]; then
+    echo_green "Info about installation on $root_dir"
+    echo "hostname: $orig_hostname"
+    exit 0
+fi
+[[ -z $new_hostname ]] && die "New hostname is required."
+
+# All checks are done, run as root
+[[ $(whoami) = "root" ]] || { sudo $0 "$@"; exit 0; }
+
+echo_green "Creating new identity for $root_dir"
+if [[ $dry_run = true ]]; then
+    echo_yellow "Dry Run, doing nothing for real."
+fi
+
+# Change hostname
+echo_green "Renew hostname from $orig_hostname to $new_hostname"
+if [[ $dry_run = false ]]; then
+    mv $hostname_file $hostname_file.old
+    echo $new_hostname > $hostname_file
+else
+    echo_yellow "Dry run, doing nothing."
+fi
+
+echo_green "Adding $new_hostname to TARGET/etc/hosts"
+hosts_file="$root_dir/etc/hosts"
+if [[ $dry_run = false ]]; then
+    grep -q '^127\.0\.1\.1' $hosts_file && \
+        `# Replace if 127.0.1.1 is already present` \
+        sed -i "s/^127\.0\.1\.1.*/127\.0\.1\.1 $new_hostname/" $hosts_file || \
+        `# Else, add 127.0.1.1 with new_hostname` \
+        echo "127.0.1.1 $new_hostname" >> $hosts_file
+fi
+
+if [[ $skip_ssh_keys = false ]]; then
+    echo_green "Re-generating ssh private keys for users"
+    set +e
+    for user in `ls $root_dir/home`; do
+        echo "...for $user"
+        if [[ $dry_run = false ]]; then
+            ssh_dir=$root_dir/home/$user/.ssh
+            mkdir -p $ssh_dir
+            yes y | ssh-keygen -t rsa -b 4096 -N "" -C "$user@$new_hostname" -f $ssh_dir/id_rsa
+        fi
+    done
+
+    # Generate resetting SSHD keys
+    echo_green "Re-generating SSH Server Keys for $root_dir"
+    if [[ $dry_run = false ]]; then
+        ssh_dir=${root_dir}/etc/ssh
+        find $ssh_dir -name 'ssh_host_*' | while IFS= read -r key; do
+            [[ ${key##*.} = "bak" ]] && continue
+            if [[ ${key##*.} = "pub" ]]; then
+                echo "Cleaning up $key"
+                rm $key
+                continue
+            fi
+            key_type=${key#$ssh_dir/ssh_host_*}
+            key_type=${key_type%_key}
+            params=
+            case $key_type in
+                rsa)
+                    params="-b 4096"
+                    ;;
+                ecdsa)
+                    params="-b 521"
+                    ;;
+            esac
+            echo_green "Generating $key with type: $key_type"
+            mv $key $key.bak
+            ssh-keygen -t $key_type $params -N '' -C "root@$new_hostname" -f $key
+            if [[ $? -gt 0 ]]; then
+                echo_yellow "Error occurred, restoring $key"
+                mv $key.bak $key
+            else
+                # Cleanup
+                #rm $key.bak
+                true
+            fi
+        done
+    else
+        echo_yellow "Dry run, not generating Server keys"
+    fi
+    set -e
+else
+    echo_yellow "Skipping SSH key generation..."
+fi
