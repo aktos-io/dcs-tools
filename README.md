@@ -143,9 +143,9 @@ a new controller/machine based on current installation.
 
        sudo cp -al /path/to/curr-target/sync-root .
 
-3. Convert to a fresh install
+3. Give a new ID: 
 
-       ./dcs-tools/convert-to-fresh-install --root-dir sync-root/ ...
+       ./dcs-tools/give-new-id --root-dir sync-root/ ...
 
 4. Create a bootable disk
 
