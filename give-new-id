@@ -132,12 +132,14 @@ if [[ $skip_ssh_keys = false ]]; then
     echo_green "Re-generating ssh private keys for users"
     set +e
     for user in `ls $root_dir/home`; do
-        echo "...for $user"
+        owner=$(ls -ldn $root_dir/home/$user | cut -d' ' -f 3)
+        echo "...for $user (uid: $owner)"
         if [[ $dry_run = false ]]; then
             ssh_file=$root_dir/home/$user/.ssh/id_rsa
-            mkdir -p $(dirname $ssh_file)
+            mkdir -p $(dirname $ssh_file) && chown $owner:$owner $(dirname $ssh_file)
             [[ -f $ssh_file ]] && rm $ssh_file
             ssh-keygen -q -t rsa -b 4096 -N "" -C "$user@$new_hostname" -f $ssh_file
+            chown $owner:$owner $ssh_file
         fi
     done
 
