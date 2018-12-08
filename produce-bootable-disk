@@ -21,7 +21,7 @@ if [[ $(id -u) > 0 ]]; then sudo $0 "$@"; exit; fi
 safe_source $DIR/aktos-bash-lib/basic-functions.sh
 safe_source $DIR/aktos-bash-lib/fs-functions.sh
 
-backup=
+src=
 device=
 verbose=0
 skip_format=
@@ -45,7 +45,7 @@ show_help () {
 
     Options:
 
-    --backup        : backup directory
+    --src           : source directory
     --device        : the device to format and create bootable disk
     --skip-format   : skip formatting target disk, only perform rsync
     --hardware      : hardware type for formatting the disk
@@ -59,12 +59,12 @@ while :; do
             show_help    # Display a usage synopsis.
             exit
             ;;
-        --backup)       # Takes an option argument; ensure it has been specified.
+        --src)       # Takes an option argument; ensure it has been specified.
             if [ "$2" ]; then
-                backup=$(realpath $2)
+                src=$(realpath $2)
                 shift
             else
-                die '"--backup" requires a non-empty option argument.'
+                die '"--src" requires a non-empty option argument.'
             fi
             ;;
         --device)       # Takes an option argument; ensure it has been specified.
@@ -112,8 +112,8 @@ if [[ ! -f "$restore_script" ]]; then
     die "No such restore script found: $hardware"
 fi
 
-if [[ ! -d $backup ]]; then
-    die "Backup directory must be provided. (not a dir: $backup)"
+if [[ ! -d $src ]]; then
+    die "Source directory must be provided. (not a dir: $src)"
 fi
 
 # BE ABSOLUTELY SURE THAT THE DEVICE IS NOT A CURRENTLY USED DISK!!!
@@ -152,6 +152,7 @@ fi
 # print the summary:
 echo "Summary: "
 echo "-----------------------------------"
+echo_yellow "Restore script: $restore_script"
 if [ $skip_format ]; then
     echo_yellow "...will skip formatting..."
 fi
@@ -159,11 +160,11 @@ echo "Using device:"
 echo
 lsblk $device | indent2
 echo
-echo "Using backup directory: .${backup#$PWD}"
+echo "Using source directory: .${src#$PWD}"
 
 if prompt_yes_no "Should we really continue?"; then
     PROJECT_ROOT=$(realpath "$DIR/..")
-    echo_green "Building $device by using files from .${backup#$PWD}"
+    echo_green "Building $device by using files from .${src#$PWD}"
 else
     echo_info "Interrupted by user."
     exit 0

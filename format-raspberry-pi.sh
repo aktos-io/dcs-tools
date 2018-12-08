@@ -2,8 +2,8 @@
 BOOT_PART="${device}${FIRST_PARTITION}"
 ROOT_PART="${device}${SECOND_PARTITION}"
 
-umount_if_mounted3 $BOOT_PART
-umount_if_mounted3 $ROOT_PART
+umount_if_mounted $BOOT_PART
+umount_if_mounted $ROOT_PART
 
 # mountpoints
 BOOT_MNT="$(mktemp -d --suffix=-boot)"
@@ -56,14 +56,14 @@ fi
 require_device $BOOT_PART
 require_device $ROOT_PART
 
-echo_green "Restoring files from backup to device..."
+echo_green "Restoring files from source to device..."
 echo "...mounting partitions"
 mount ${BOOT_PART} ${BOOT_MNT}
 mount ${ROOT_PART} ${ROOT_MNT}
 
-echo "...restoring files from backup (.${backup#$PWD}) (this may take a while...)"
-rsync  -aHAXh "${backup}/boot/" ${BOOT_MNT}
-rsync  -aHAXh --exclude "boot" "${backup}/" ${ROOT_MNT}
+echo "...restoring files from source (.${src#$PWD}) (this may take a while...)"
+rsync --info=progress2 -aHAXh "${src}/boot/" ${BOOT_MNT}
+rsync --info=progress2 -aHAXh --exclude "boot" "${src}/" ${ROOT_MNT}
 mkdir -p "${ROOT_MNT}/boot"
 
 echo "...setting /etc/resolv.conf attributes to make it immutable"
