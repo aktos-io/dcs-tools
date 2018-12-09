@@ -140,6 +140,7 @@ if [[ $skip_ssh_keys = false ]]; then
             [[ -f $ssh_file ]] && rm $ssh_file
             ssh-keygen -q -t rsa -b 4096 -N "" -C "$user@$new_hostname" -f $ssh_file
             chown $owner:$owner $ssh_file
+            echo "Public key: $(cat $ssh_file.pub)"
         fi
     done
 
@@ -164,6 +165,9 @@ if [[ $skip_ssh_keys = false ]]; then
                 ecdsa)
                     params="-b 521"
                     ;;
+                key)
+                    continue
+                    ;;
             esac
             echo "...generating $key"
             mv $key $key.bak
@@ -184,3 +188,7 @@ if [[ $skip_ssh_keys = false ]]; then
 else
     echo_yellow "Skipping SSH key generation..."
 fi
+
+echo "syncing..."
+sync
+echo_green "done."

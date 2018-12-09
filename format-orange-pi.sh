@@ -5,7 +5,7 @@ echo_green "Formatting for Orange Pi"
 
 ROOT_PART="${device}${FIRST_PARTITION}"
 
-umount_if_mounted3 $ROOT_PART
+umount_if_mounted $ROOT_PART
 
 # mountpoints
 ROOT_MNT="$(mktemp -d --suffix=-root)"
@@ -37,19 +37,19 @@ EOF
     mkfs.$fstype ${ROOT_PART}
 
     # Bootloader workaround
-    old_uuid=$(cat $backup/boot/armbianEnv.txt | grep rootdev | sed "s/rootdev=UUID=//")
+    old_uuid=$(cat $src/boot/armbianEnv.txt | grep rootdev | sed "s/rootdev=UUID=//")
     echo_green "...changing UUID to $old_uuid"
     yes | tune2fs $ROOT_PART -U $old_uuid
 fi
 
 require_device $ROOT_PART
 
-echo_green "Restoring files from backup to device..."
+echo_green "Restoring files from source to device..."
 echo "...mounting partitions"
 mount ${ROOT_PART} ${ROOT_MNT}
 
-echo "...rsync from .${backup#$PWD} to ${ROOT_PART} (this may take a while...)"
-rsync  -aHAXh "${backup}/" ${ROOT_MNT}
+echo "...rsync from .${src#$PWD} to ${ROOT_PART} (this may take a while...)"
+rsync  -aHAXh "${src}/" ${ROOT_MNT}
 
 echo "...setting /etc/resolv.conf attributes to make it immutable"
 chattr +i $ROOT_MNT/etc/resolv.conf
