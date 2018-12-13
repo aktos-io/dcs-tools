@@ -62,7 +62,7 @@ mount ${BOOT_PART} ${BOOT_MNT}
 mount ${ROOT_PART} ${ROOT_MNT}
 
 echo "...restoring files from source (.${src#$PWD}) (this may take a while...)"
-rsync --info=progress2 -aHAXh "${src}/boot/" ${BOOT_MNT}
+rsync --info=progress2 -rltD -HAXh "${src}/boot/" ${BOOT_MNT}
 rsync --info=progress2 -aHAXh --exclude "boot" "${src}/" ${ROOT_MNT}
 mkdir -p "${ROOT_MNT}/boot"
 
