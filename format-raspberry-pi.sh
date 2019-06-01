@@ -12,7 +12,7 @@ echo "Using mount points: "
 echo "...Boot MNT: $BOOT_MNT"
 echo "...Root MNT: $ROOT_MNT"
 
-if [ ! $skip_format ]; then
+if ! $skip_format; then
     echo "Creating partition table on ${device}..."
     # to create the partitions programatically (rather than manually)
     # we're going to simulate the manual input to fdisk
@@ -61,7 +61,7 @@ echo "...mounting partitions"
 mount ${BOOT_PART} ${BOOT_MNT}
 mount ${ROOT_PART} ${ROOT_MNT}
 
-echo "...restoring files from source (.${src#$PWD}) (this may take a while...)"
+echo "...restoring files from source ($(get_relative $PWD $src)) (this may take a while...)"
 rsync --info=progress2 -rltD -HAXh "${src}/boot/" ${BOOT_MNT}
 rsync --info=progress2 -aHAXh --exclude "boot" "${src}/" ${ROOT_MNT}
 mkdir -p "${ROOT_MNT}/boot"

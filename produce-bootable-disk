@@ -24,7 +24,7 @@ safe_source $DIR/aktos-bash-lib/fs-functions.sh
 src=
 device=
 verbose=0
-skip_format=
+skip_format=false
 
 die () {
     if [[ "$@" ]]; then
@@ -35,6 +35,13 @@ die () {
     show_help
     exit 5
 }
+
+get_relative(){
+    current="$1"
+    absolute="$2"
+    echo $(perl -MFile::Spec -e 'print File::Spec->abs2rel("'$absolute'","'$current'")')
+}
+
 
 show_help () {
     cat <<HELP
@@ -102,7 +109,7 @@ done
 
 # check the arguments
 # -----------------------------------------------
-restore_script="$DIR/format-$hardware.sh"
+restore_script="$(get_relative $PWD $DIR/format-$hardware.sh)"
 if [[ ! -f "$restore_script" ]]; then
     formatters=$(ls $DIR/format-*.sh | xargs -n 1 basename | sed "s/format-\(.*\)\.sh/\1/")
     echo_yellow "ERROR: One of the hardware types must be provided: "
@@ -153,14 +160,15 @@ fi
 echo "Summary: "
 echo "-----------------------------------"
 echo_yellow "Restore script: $restore_script"
-if [ $skip_format ]; then
+if $skip_format; then
     echo_yellow "...will skip formatting..."
 fi
 echo "Using device:"
 echo
 lsblk $device | indent2
 echo
-echo "Using source directory: .${src#$PWD}"
+relative_src=$(get_relative $PWD, $src)
+echo "Using source directory: ${relative_src}"
 
 if prompt_yes_no "Should we really continue?"; then
     PROJECT_ROOT=$(realpath "$DIR/..")
