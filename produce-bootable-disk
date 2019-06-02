@@ -36,11 +36,6 @@ die () {
     exit 5
 }
 
-get_relative(){
-    current="$1"
-    absolute="$2"
-    echo $(perl -MFile::Spec -e 'print File::Spec->abs2rel("'$absolute'","'$current'")')
-}
 
 
 show_help () {
