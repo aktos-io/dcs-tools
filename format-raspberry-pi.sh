@@ -62,15 +62,29 @@ mount ${BOOT_PART} ${BOOT_MNT}
 mount ${ROOT_PART} ${ROOT_MNT}
 
 echo "...restoring files from source ($(get_relative $PWD $src)) (this may take a while...)"
+set +e # do not exit on error because some transfer errors are not important
+error=false
 rsync --info=progress2 -rltD -HAXh "${src}/boot/" ${BOOT_MNT}
+[[ $? == 0 ]] || error=true
 rsync --info=progress2 -aHAXh --exclude "boot" "${src}/" ${ROOT_MNT}
+[[ $? == 0 ]] || error=true
 mkdir -p "${ROOT_MNT}/boot"
 
-echo "...setting /etc/resolv.conf attributes to make it immutable"
-chattr +i $ROOT_MNT/etc/resolv.conf
+if $error; then
+    if prompt_yes_no "Should we ignore above errors?"; then
+        echo_yellow "OK, we are ignoring above errors."
+    else
+        echo_red "Performing final cleanup."
+    fi
+fi
 
-echo "...syncing"
-sync
+if ! $error; then
+    echo "...setting /etc/resolv.conf attributes to make it immutable"
+    chattr +i $ROOT_MNT/etc/resolv.conf
+
+    echo "...syncing"
+    sync
+fi
 
 echo "...unmounting devices"
 umount ${BOOT_PART}
@@ -80,7 +94,9 @@ echo "...removing mountpoints"
 rmdir ${BOOT_MNT}
 rmdir ${ROOT_MNT}
 
-echo_yellow "Do not forget to check the following files on target: "
-echo_yellow " * /boot/cmdline.txt"
-echo_yellow " * /etc/fstab"
-echo_yellow " * /etc/network/interfaces"
+if ! $error; then
+    echo_yellow "Do not forget to check the following files on target: "
+    echo_yellow " * /boot/cmdline.txt"
+    echo_yellow " * /etc/fstab"
+    echo_yellow " * /etc/network/interfaces"
+fi
