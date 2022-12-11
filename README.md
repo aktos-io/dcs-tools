@@ -97,6 +97,34 @@ Create a backup from the `sync-root` folder into `./backups` folder either by ha
 > `method-*` flags can be set by `make method-btrfs` or `make method-hardlinks` commands.
 
 
+### UDP port forwarding 
+
+> Taken from https://superuser.com/a/974091/187576
+
+Example connection: 
+
+```
+[PLC 192.168.250.9 UDP_9600] <--> [Scada-Gateway (sgw)] <--> [Rendezvous server] <--> [Laptop] <--> [Virtual machine]
+```
+
+1. Assign the same ip as the PLC has to your laptop: `sudo ifconfig wlp2s0:1 192.168.250.9`
+
+2. In terminal 1 on your laptop:
+
+		laptop$ cd your/project
+		laptop$ make ssh ARGS="-L 9602:localhost:9602"
+		sgw$ socat -T10 TCP4-LISTEN:9602,fork UDP4:192.168.250.9:9600
+
+3. In terminal 2 on your laptop: 
+
+		laptop$ sudo socat UDP4-LISTEN:9600,fork TCP4:localhost:9602
+
+4. In your virtual machine's network settings -> Bridged adapter -> wlp2s0
+
+
+Result: Your virtual machine will not detect any difference and will connect the target PLC as if it is connected directly.
+
+
 ## Advanced actions:
 
 Following tools are for advanced usage, use them **with extreme caution**.
