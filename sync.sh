@@ -34,13 +34,6 @@ else
     echo_green "Using sync directory: $sync_dir"
 fi
 
-if prompt_yes_no "Should we really continue?"; then
-    echo_yellow "syncs will go to: $sync_dir"
-else
-    echo_info "Interrupted by user."
-    exit 0
-fi
-
 start_timer
 
 $RSYNC -aHAXvPh --delete --delete-excluded --exclude-from "$DIR/exclude-list.txt" \
