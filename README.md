@@ -1,18 +1,15 @@
 # Description
 
-This toolset is intended to use for managing remote Linux devices (RaspberryPi in mind, but any remote Linux system will work) from host Linux systems, by basically simplifying 6 tasks, where you need to:
+This toolset is intended for administrating remote Linux devices that are directly connected or behind a proxy server (RaspberryPi in mind, but any remote Linux system will work), by simplifying 7 tasks:
 
-1. ..make `ssh` for performing remote tasks (either directly or over a link up server).
-2. ..use simple drag and drop style file transfers (by `sshfs`).
-3. ..backup the target's entire root filesystem (by `rsync`).
-4. ..create fast and efficient **differential full backups** (by hardlinks or by BTRFS snapshots).
-5. ..create a separate bootable system disk from any of your backups.
-6. ..clone a target with a new identity.
+1. `make ssh` to connect the remote shell (either directly or over a link up server).
+2. Responsively edit remote files via local IDE almost independent from the internet connection speed and interruptions ("Responsive remote development").
+3. Use simple drag and drop style file transfers (by `sshfs`).
+4. Backup the target's entire root filesystem (by `rsync`).
+5. Create fast and efficient **differential full backups** (by hardlinks or by BTRFS snapshots).
+6. Create a separate physical bootable system disk from any of your backups.
+7. Clone the current device with a new identity to create a new device.
 
-This simplification is achieved by:
-
- * Placing separate scripts for each task described above and providing a simple `Makefile`.
- * Keeping the scripts, configuration files and backups in a folder called `your-project`.
 
 # Install
 
@@ -67,6 +64,22 @@ make ssh
 
 Makes ssh connection either directly or via the link up server according to [your connection type](#set-connection-type).
 
+### Responsive Remote Development
+
+Responsive remote development means keeping a local folder in sync with a remote folder. 
+
+1. `cp ./sync-config-example.sh path/to/your/project/folder/my-sync-config.sh`
+2. Edit `my-sync-config.sh` accordingly. See `./sync-with-sgw.sh --help` for options.
+3. Send your project folder to your remote system and watch for changes by: 
+
+	    ./sync-with-sgw.sh -c path/to/your/project/folder/my-sync-config.sh --dry-run
+
+This will keep `path/to/your/project/folder/` and `$dest_dir` (within your config file) in sync. Remove the `--dry-run` switch for real transfer if the transfer summary is as you expected. 
+
+Synchronization will exclude the `.git` folder and the other files/folders listed in `path/to/your/project/folder/.gitignore`.
+
+`run_before_sync` hooks can be used to build, bundle, copy files or perfom any other tasks before the actual synchronization. Synchronization will fail and display a visual error message if any of the hooks fails. 
+
 ### Mount target root
 
 ```bash
@@ -74,7 +87,9 @@ make mount-root
 ```
 Mounts the root folder to `your-project/NODE_ROOT`, which you can use for drag-n-drop style file transfers.
 
-You can later unmount with `make umount-root` without using `sudo` command.
+You can later unmount with `make umount-root` without using `sudo` command. 
+
+This feature is only practical with fast (generally on local) connections.
 
 ### Sync target's root folder
 
