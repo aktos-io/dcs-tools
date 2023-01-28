@@ -119,10 +119,12 @@ Create a backup from the `sync-root` folder into `./backups` folder either by ha
 Example connection: 
 
 ```
-[PLC 192.168.250.9 UDP_9600] <--> [Scada-Gateway (sgw)] <--> [Rendezvous server] <--> [Laptop] <--> [Virtual machine]
+[PLC 192.168.250.9 UDP/9600] <--> [Scada-Gateway (sgw)] <--> [Rendezvous server] <--> [Laptop] <--> [Virtual machine]
 ```
 
-1. Assign the same ip as the PLC has to your laptop: `sudo ifconfig wlp2s0:1 192.168.250.9`
+1. Assign the same IP of the PLC to your laptop: 
+
+		sudo ip a add 192.168.250.9/24 dev wlp2s0
 
 2. In terminal 1 on your laptop:
 
