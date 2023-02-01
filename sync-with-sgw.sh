@@ -85,7 +85,7 @@ done; set -- "${args_backup[@]-}"
 [[ -f "$config" ]] || die "Configuration file is required."
 source "$config"
 
-SRC_DIR="$(dirname "$config")"
+SRC_DIR="$(dirname "$config")/"
 
 read SGW_USERNAME SGW_HOST SGW_PORT_ON_SERVER <<< $(echo $dest_host | sed 's/@/ /' | sed 's/:/ /')
 [[ -z $SGW_HOST ]] && { SGW_HOST=$SGW_USERNAME; SGW_USERNAME=''; }
