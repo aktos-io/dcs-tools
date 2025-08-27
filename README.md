@@ -202,3 +202,7 @@ If you are not using **btrfs**, "dead simple copies" feature has a problem by it
 Make sure that you are performing `make sync-root` command on a native Linux
 filesystem. You will end up having a backup with wrong file ownership and/or
 permissions otherwise.
+
+### Hardlinks are not always safe 
+
+Hardlinks are simply pointers to a file in the filesystem. If you delete or overwrite a file, your hardlinks (thus your backups) are safe. However, if you open a file and change the contents, all hardlinks point to this new data. So your backups (your previous data) are instantly broken. If you don't use BTRFS-method, you should always update your files by overwriting, not updating their contents. 
