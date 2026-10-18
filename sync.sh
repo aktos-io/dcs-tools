@@ -13,7 +13,7 @@ safe_source $DIR/aktos-bash-lib/ssh-functions.sh
 safe_source $DIR/common.sh
 $DIR/create-ssh-config
 
-sync_dir=$(realpath $DIR/../sync-root)
+sync_dir=$(get_relative $PWD $(realpath $DIR/../sync-root))
 source="/"
 RSYNC="nice -n19 ionice -c3 rsync"
 

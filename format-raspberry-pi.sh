@@ -2,8 +2,8 @@
 BOOT_PART="${device}${FIRST_PARTITION}"
 ROOT_PART="${device}${SECOND_PARTITION}"
 
-umount_if_mounted3 $BOOT_PART
-umount_if_mounted3 $ROOT_PART
+umount_if_mounted $BOOT_PART
+umount_if_mounted $ROOT_PART
 
 # mountpoints
 BOOT_MNT="$(mktemp -d --suffix=-boot)"
@@ -12,7 +12,7 @@ echo "Using mount points: "
 echo "...Boot MNT: $BOOT_MNT"
 echo "...Root MNT: $ROOT_MNT"
 
-if [ ! $skip_format ]; then
+if ! $skip_format; then
     echo "Creating partition table on ${device}..."
     # to create the partitions programatically (rather than manually)
     # we're going to simulate the manual input to fdisk
@@ -56,21 +56,35 @@ fi
 require_device $BOOT_PART
 require_device $ROOT_PART
 
-echo_green "Restoring files from backup to device..."
+echo_green "Restoring files from source to device..."
 echo "...mounting partitions"
 mount ${BOOT_PART} ${BOOT_MNT}
 mount ${ROOT_PART} ${ROOT_MNT}
 
-echo "...restoring files from backup (.${backup#$PWD}) (this may take a while...)"
-rsync  -aHAXh "${backup}/boot/" ${BOOT_MNT}
-rsync  -aHAXh --exclude "boot" "${backup}/" ${ROOT_MNT}
+echo "...restoring files from source ($(get_relative $PWD $src)) (this may take a while...)"
+set +e # do not exit on error because some transfer errors are not important
+error=false
+rsync --info=progress2 -rltD -HAXh "${src}/boot/" ${BOOT_MNT}
+[[ $? == 0 ]] || error=true
+rsync --info=progress2 -aHAXh --exclude "boot" "${src}/" ${ROOT_MNT}
+[[ $? == 0 ]] || error=true
 mkdir -p "${ROOT_MNT}/boot"
 
-echo "...setting /etc/resolv.conf attributes to make it immutable"
-chattr +i $ROOT_MNT/etc/resolv.conf
+if $error; then
+    if prompt_yes_no "Should we ignore above errors?"; then
+        echo_yellow "OK, we are ignoring above errors."
+    else
+        echo_red "Performing final cleanup."
+    fi
+fi
 
-echo "...syncing"
-sync
+if ! $error; then
+    echo "...setting /etc/resolv.conf attributes to make it immutable"
+    chattr +i $ROOT_MNT/etc/resolv.conf
+
+    echo "...syncing"
+    sync
+fi
 
 echo "...unmounting devices"
 umount ${BOOT_PART}
@@ -80,7 +94,9 @@ echo "...removing mountpoints"
 rmdir ${BOOT_MNT}
 rmdir ${ROOT_MNT}
 
-echo_yellow "Do not forget to check the following files on target: "
-echo_yellow " * /boot/cmdline.txt"
-echo_yellow " * /etc/fstab"
-echo_yellow " * /etc/network/interfaces"
+if ! $error; then
+    echo_yellow "Do not forget to check the following files on target: "
+    echo_yellow " * /boot/cmdline.txt"
+    echo_yellow " * /etc/fstab"
+    echo_yellow " * /etc/network/interfaces"
+fi

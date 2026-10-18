@@ -4,4 +4,8 @@ set_dir () { DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
 safe_source () { source $1; set_dir; }
 set_dir
 
+safe_source $DIR/aktos-bash-lib/basic-functions.sh
+
+echo_yellow "Note that this variant will skip formatting."
+sleep 2
 $DIR/produce-bootable-disk --skip-format "$@"

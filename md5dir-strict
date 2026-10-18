@@ -1,0 +1,17 @@
+#!/bin/bash
+set -eu -o pipefail
+set_dir(){ _dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; }; set_dir
+safe_source () { source $1; set_dir; }
+# end of bash boilerplate
+
+src=$1
+
+if [[ ! -d $src ]];then
+    echo "Source is not a directory, exiting."
+    exit 1
+fi
+
+# All checks are done, run as root.
+[[ $(whoami) = "root" ]] || { sudo $0 $*; exit 0; }
+
+tar -cf - $src | md5sum | awk '{print $1'}

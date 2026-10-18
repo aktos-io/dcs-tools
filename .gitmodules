@@ -1,3 +1,6 @@
 [submodule "aktos-bash-lib"]
 	path = aktos-bash-lib
 	url = https://github.com/aktos-io/aktos-bash-lib
+[submodule "smith-sync"]
+	path = smith-sync
+	url = https://github.com/ceremcem/smith-sync
