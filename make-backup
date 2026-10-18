@@ -103,7 +103,8 @@ if [[ "$method" == "hardlinks" ]]; then
     cp -al $source_dir $backup_dir/$tmp_name
     mv $backup_dir/$tmp_name $backup_dir/$backup_name
 elif [[ "$method" == "btrfs" ]]; then
-    is_btrfs_subvolume $source_dir || die "Source should be BTRFS subvolume."
-    btrfs sub snap -r "$source_dir" "$backup_dir/$backup_name"
+    is_btrfs $source_dir || die "Source should be BTRFS filesystem."
+    is_btrfs $backup_dir || die "Backup dir should be BTRFS filesystem."
+    cp -a --reflink=always "$source_dir" "$backup_dir/$backup_name"
 fi
 show_timer "Backup completed in:"

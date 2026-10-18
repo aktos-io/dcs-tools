@@ -6,7 +6,7 @@ This toolset is intended for administrating remote Linux devices that are direct
 2. Responsively edit remote files via local IDE almost independent from the internet connection speed and interruptions ("Responsive remote development").
 3. Use simple drag and drop style file transfers (by `sshfs`).
 4. Backup the target's entire root filesystem (by `rsync`).
-5. Create fast and efficient **differential full backups** (by hardlinks or by BTRFS snapshots).
+5. Create fast and efficient **differential full backups** (by hardlinks or by BTRFS reflinks).
 6. Create a separate physical bootable system disk from any of your backups.
 7. Clone the current device with a new identity to create a new device.
 
@@ -107,7 +107,7 @@ This command will only copy the current state of your target to your host machin
 make backup-sync-root
 ```
 
-Create a backup from the `sync-root` folder into `./backups` folder either by hardlinks method or by creating a btrfs subvolume, according to your `your-project/method-*` flag.
+Create a backup from the `sync-root` folder into `./backups` folder either by hardlinks method or by creating a btrfs reflink, according to your `your-project/method-*` flag.
 
 > `method-*` flags can be set by `make method-btrfs` or `make method-hardlinks` commands.
 
@@ -187,15 +187,13 @@ Backups have following properties:
 * **differential** (only differences are transmitted)
 * **dead simple copies** of original files (you can simply copy/paste when you need to restore or move your files around) **(see BIG WARNING)**
 * **versioned** : Take any number of full backups as much as you like. You are responsible for deleting old backups.
-* **efficient storage usage** (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks or BTRFS subvolumes)
+* **efficient storage usage** (if you backup your 10 GB root for 5 times, you end up using 10.2 GB disk space if you have no modified files. But you will see the `snapshots` folder has a size of 50 GB. (Magic? No: Hardlinks or BTRFS reflinks)
 
 # BIG WARNING
 
 ### Move your backups around carefully
 
-If you are not using **btrfs**, "dead simple copies" feature has a problem by its design: As backups are just plain folders, this may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`** for such movements.
-
-> If you are using `--method btrfs`, backups are made as readonly snapshots, so you will not have such problems.
+If you are **not using BTRFS**, "dead simple copies" feature has a problem by its design: As backups are just plain folders, this may lead breaking (unintentionally changing) the ownership of the files if you move/copy your files carelessly (eg. if you `mv your/snapshot to/another/location` and then interrupt the command in the middle, you will probably end up with moved files having `root:root` permissions.) That's why you **SHOULD always use `rsync`** for such movements.
 
 ### Use correct filesystem
 
