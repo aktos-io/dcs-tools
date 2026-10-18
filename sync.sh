@@ -34,16 +34,16 @@ else
     echo_green "Using sync directory: $sync_dir"
 fi
 
-if prompt_yes_no "Should we really continue?"; then
-    echo_yellow "syncs will go to: $sync_dir"
-else
-    echo_info "Interrupted by user."
-    exit 0
-fi
-
 start_timer
 
-$RSYNC -aHAXvPh --delete --delete-excluded --exclude-from "$DIR/exclude-list.txt" \
-	--rsh="$SSH" --rsync-path="sudo rsync" target_$conn_method:$source $sync_dir
-
+retry_count=1
+while :; do
+    $RSYNC -aHAXvPh --delete --delete-excluded --exclude-from "$DIR/exclude-list.txt" \
+	    --rsh="$SSH" --rsync-path="sudo rsync" target_$conn_method:$source $sync_dir && break || true
+    echo "Retrying in 10 seconds (retry_count=$retry_count)..."
+    notify-send -u critical "Retrying sync" "retry_count=$retry_count"
+    ((retry_count++))
+    sleep 10
+done
+echo "Total retry_count is $retry_count"
 show_timer "sync completed in:"
